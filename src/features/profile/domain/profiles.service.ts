@@ -1,0 +1,163 @@
+import { AppErrorCode, normalizeError } from "@/shared";
+import { profilesRepository } from "../data/profiles.repository";
+import { updateProfileSchema } from "./profiles.schema";
+
+import { TablesInsert, TablesUpdate } from "@/types";
+import { UserProfile } from "./profiles.types";
+
+/**
+ * Service layer for profile business logic
+ * Handles validation, business rules, and error normalization
+ */
+export class ProfilesService {
+  /**
+   * Create a new user profile with validation
+   */
+  async createProfile(data: TablesInsert<"profiles">): Promise<UserProfile> {
+    try {
+      // Sanitize and process data
+      const sanitizedData = this.sanitizeProfileData(data);
+
+      // Create profile
+      return await profilesRepository.create(sanitizedData);
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Get user profile by user ID
+   */
+  async getProfile(userId: string): Promise<UserProfile> {
+    try {
+      if (!userId) {
+        throw new Error(AppErrorCode.PERMISSION_DENIED);
+      }
+
+      return await profilesRepository.getByUserId(userId);
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Get current user's profile
+   */
+  async getCurrentProfile(): Promise<UserProfile | null> {
+    try {
+      return await profilesRepository.getCurrentProfile();
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Update user profile with validation
+   */
+  async updateProfile(
+    userId: string,
+    data: Partial<TablesUpdate<"profiles">>
+  ): Promise<UserProfile> {
+    try {
+      // Validate input data
+      const validationResult = updateProfileSchema.safeParse(data);
+      if (!validationResult.success) {
+        throw validationResult.error;
+      }
+
+      // Sanitize and process data
+      const sanitizedData = this.sanitizeProfileData(validationResult.data);
+
+      // Update profile
+      const updateResult = await profilesRepository.updateByUserId(
+        userId,
+        sanitizedData
+      );
+
+      return updateResult;
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Update current user's profile
+   */
+  async updateCurrentProfile(
+    data: Partial<TablesUpdate<"profiles">>
+  ): Promise<UserProfile> {
+    try {
+      // Sanitize and process data (skip validation for onboarding fields)
+      const sanitizedData = this.sanitizeProfileData(data);
+
+      // Update current user's profile
+      const updateResult = await profilesRepository.updateCurrentProfile(
+        sanitizedData
+      );
+
+      return updateResult;
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Check if profile exists for user
+   */
+  async profileExists(userId: string): Promise<boolean> {
+    try {
+      return await profilesRepository.existsByUserId(userId);
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Delete user profile
+   */
+  async deleteProfile(userId: string): Promise<void> {
+    try {
+      await profilesRepository.deleteByUserId(userId);
+    } catch (error) {
+      throw normalizeError(error);
+    }
+  }
+
+  /**
+   * Sanitize profile data to prevent XSS and ensure data integrity
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private sanitizeProfileData(data: any): any {
+    const sanitized = { ...data };
+
+    // Sanitize display name
+    if (sanitized.displayName) {
+      sanitized.displayName = sanitized.displayName.trim();
+    }
+
+    // Sanitize avatar URL
+    if (sanitized.avatarUrl) {
+      sanitized.avatarUrl = sanitized.avatarUrl.trim();
+      // Remove empty string URLs
+      if (sanitized.avatarUrl === "") {
+        sanitized.avatarUrl = undefined;
+      }
+    }
+
+    // Sanitize favorite genres
+    if (sanitized.favoriteGenres) {
+      sanitized.favoriteGenres = [
+        ...new Set(
+          sanitized.favoriteGenres
+            .filter((genre: string) => genre && typeof genre === "string")
+            .map((genre: string) => genre.trim())
+        ),
+      ];
+    }
+
+    return sanitized;
+  }
+}
+
+// Export singleton instance
+export const profileService = new ProfilesService();
