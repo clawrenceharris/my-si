@@ -20,15 +20,50 @@ interface SignupFormProps {
 export default function SignUpForm({ onSwitchToLogin }: SignupFormProps) {
   const {
     control,
-    watch,
     formState: { errors, disabled },
   } = useFormContext<SignUpFormInput>();
   const [showPassword, setShowPassword] = useState(false);
-  const watched = watch("email");
 
-  console.log(watched);
   return (
     <>
+      {/* First Name */}
+      <div className="flex flex-row gap-3">
+        <FormField
+          control={control}
+          name="firstName"
+          defaultValue=""
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel className="sr-only">First Name</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="First name" {...field} />
+              </FormControl>
+              {errors.firstName && (
+                <FormMessage>{errors.firstName.message}</FormMessage>
+              )}
+            </FormItem>
+          )}
+        />
+        {/* Last Name */}
+        <FormField
+          control={control}
+          name="lastName"
+          defaultValue=""
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel className="sr-only">First Name</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Last name" {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        {(errors.lastName || errors.firstName) && (
+          <FormMessage>
+            {errors.firstName?.message || errors.lastName?.message}
+          </FormMessage>
+        )}
+      </div>
       {/* Email */}
       <FormField
         control={control}
@@ -36,16 +71,9 @@ export default function SignUpForm({ onSwitchToLogin }: SignupFormProps) {
         defaultValue=""
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="sr-only" htmlFor="signup-email">
-              Email Address
-            </FormLabel>
+            <FormLabel className="sr-only">Email Address</FormLabel>
             <FormControl>
-              <Input
-                id="signup-email"
-                type="text"
-                placeholder="Email"
-                {...field}
-              />
+              <Input type="text" placeholder="Email" {...field} />
             </FormControl>
             {errors.email && <FormMessage>{errors.email.message}</FormMessage>}
           </FormItem>
@@ -59,14 +87,10 @@ export default function SignUpForm({ onSwitchToLogin }: SignupFormProps) {
         defaultValue=""
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="sr-only" htmlFor="signup-password">
-              Password
-            </FormLabel>
+            <FormLabel className="sr-only">Password</FormLabel>
             <FormControl>
               <Input
-                id="signup-password"
                 type={showPassword ? "text" : "password"}
-                autoComplete="new-password"
                 placeholder="Password"
                 {...field}
               />
@@ -94,14 +118,14 @@ export default function SignUpForm({ onSwitchToLogin }: SignupFormProps) {
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
-            <button
-              type="button"
+            <Button
+              variant={"link"}
               onClick={onSwitchToLogin}
               className="btn font-medium text-primary hover:text-red-700"
               disabled={disabled}
             >
               Sign in
-            </button>
+            </Button>
           </p>
         </div>
       )}

@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useErrorHandler } from "./use-error-handler";
 
 // Hook for handling async operations with built-in error handling
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useAsyncOperation<T extends any[], R>(
   operation: (...args: T) => Promise<R>
 ) {

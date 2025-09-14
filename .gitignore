@@ -7,6 +7,7 @@
 
 # testing
 /coverage
+/__tests__
 
 # next.js
 /.next/
@@ -37,3 +38,9 @@ next-env.d.ts
 
 #vscode
 /.vscode
+
+#stories
+*.stories.ts
+
+/supabase
+

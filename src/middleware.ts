@@ -47,10 +47,8 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/", // All main app routes
-    "/onboarding", // All onboarding routes
     "/dashboard/:path*", // All dashboard routes
     "/settings/:path*", // All settings routes
-    "/auth/:path*", // All auth routes
     "/api/:path*", // All API routes
   ],
 };

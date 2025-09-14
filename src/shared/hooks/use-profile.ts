@@ -4,13 +4,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 /**
  * Hook for managing user profile data with TanStack Query
  */
-export function useProfile(userId: string) {
+export function useProfile(userId?: string) {
   const queryClient = useQueryClient();
   // Query for getting user profile
   const profileQuery = useQuery({
     queryKey: ["profile", userId],
     queryFn: async () => {
-      const data = await profileService.getProfile(userId);
+      if (!userId) return null;
+      const data = await profileService.getCurrentProfile();
       return data;
     },
     enabled: !!userId,

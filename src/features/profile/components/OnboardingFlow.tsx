@@ -4,7 +4,6 @@ import { ChevronLeft } from "lucide-react";
 import { useOnboarding } from "../hooks/use-onboarding";
 import { OnboardingStep } from "../domain/onboarding.types";
 import { RoleSelectionStep } from "./RoleSelectionStep";
-import { CourseSelectionStep } from "./CourseSelectionStep";
 import type { OnboardingData } from "../domain/onboarding.types";
 
 interface OnboardingFlowProps {
@@ -14,7 +13,7 @@ interface OnboardingFlowProps {
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const { state, actions, helpers } = useOnboarding();
   const { currentStep, data, isComplete } = state;
-  const { updateData, completeStep, skipStep, goBack } = actions;
+  const { updateData, completeStep, goBack } = actions;
   const { getProgress, canGoBack } = helpers;
 
   const progress = getProgress();
@@ -39,29 +38,13 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           />
         );
 
-      case OnboardingStep.COURSES_TAUGHT:
-        return (
-          <CourseSelectionStep
-            selectedCourses={data.coursesInstructed || []}
-            onCoursesChange={(courses) =>
-              updateData({ coursesInstructed: courses })
-            }
-            onNext={() => completeStep(OnboardingStep.COURSES_TAUGHT)}
-            onSkip={skipStep}
-          />
-        );
-
       default:
         return null;
     }
   };
 
-  if (isComplete) {
-    return null; // Component will unmount after onComplete is called
-  }
-
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <>
       {/* Progress Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -99,13 +82,6 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
       {/* Step Content */}
       <div className="space-y-6">{renderCurrentStep()}</div>
-
-      {/* Footer */}
-      <div className="mt-6 text-center">
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          You can always update these preferences later in your settings
-        </p>
-      </div>
-    </div>
+    </>
   );
 }

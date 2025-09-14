@@ -1,4 +1,4 @@
-import { UserRole } from "./profiles.types";
+import { UserRole } from "@/types/user";
 
 // Onboarding step identifiers
 export enum OnboardingStep {
@@ -34,14 +34,6 @@ export interface OnboardingStepConfig {
   showFor: (data: OnboardingData) => boolean;
   validate: (data: OnboardingData) => boolean;
   nextStep: (data: OnboardingData) => OnboardingStep | null;
-}
-
-// Course options for SI Leaders
-export interface Course {
-  id: string;
-  name: string;
-  code: string;
-  department: string;
 }
 
 // Onboarding actions
