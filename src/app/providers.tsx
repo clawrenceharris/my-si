@@ -3,8 +3,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { User } from "@supabase/supabase-js";
 import { UserContext } from "@/shared/hooks/use-user";
+import { ErrorState, LoadingState } from "@/components/states";
+import { useRouter } from "next/navigation";
+import { useProfile, useAuth } from "@/shared/hooks";
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -56,14 +58,35 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function UserProvider({
-  user,
-  children,
-}: {
-  user: User;
-  children: ReactNode;
-}) {
+export function UserProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const { user, loading: loadingAuth } = useAuth();
+  const { profile, loading: loadingProfile } = useProfile(user?.id);
+
+  if (loadingProfile || loadingAuth) {
+    return <LoadingState />;
+  }
+  if (!user)
+    return (
+      <ErrorState
+        message="You are not logged in at the moment. Please reauthenticate to continue."
+        retryLabel="Log In"
+        onRetry={() => router.replace("/auth/login")}
+      />
+    );
+  if (!profile)
+    return (
+      <ErrorState
+        title="Couldn't Find Profile"
+        message="There doesn't seem to be a profile associated with your account. If you are an SI Leader click retry"
+        retryLabel="Log In"
+        onRetry={() => router.replace("/auth/login")}
+      />
+    );
+
   return (
-    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ user: { ...user, profile } }}>
+      {children}
+    </UserContext.Provider>
   );
 }

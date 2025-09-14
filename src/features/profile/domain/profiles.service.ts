@@ -3,7 +3,7 @@ import { profilesRepository } from "../data/profiles.repository";
 import { updateProfileSchema } from "./profiles.schema";
 
 import { TablesInsert, TablesUpdate } from "@/types";
-import { UserProfile } from "./profiles.types";
+import { Profiles } from "@/types/tables";
 
 /**
  * Service layer for profile business logic
@@ -13,7 +13,7 @@ export class ProfilesService {
   /**
    * Create a new user profile with validation
    */
-  async createProfile(data: TablesInsert<"profiles">): Promise<UserProfile> {
+  async createProfile(data: TablesInsert<"profiles">): Promise<Profiles> {
     try {
       // Sanitize and process data
       const sanitizedData = this.sanitizeProfileData(data);
@@ -28,13 +28,13 @@ export class ProfilesService {
   /**
    * Get user profile by user ID
    */
-  async getProfile(userId: string): Promise<UserProfile> {
+  async getProfile(userId: string): Promise<Profiles | null> {
     try {
       if (!userId) {
         throw new Error(AppErrorCode.PERMISSION_DENIED);
       }
 
-      return await profilesRepository.getByUserId(userId);
+      return await profilesRepository.getById(userId);
     } catch (error) {
       throw normalizeError(error);
     }
@@ -43,7 +43,7 @@ export class ProfilesService {
   /**
    * Get current user's profile
    */
-  async getCurrentProfile(): Promise<UserProfile | null> {
+  async getCurrentProfile(): Promise<Profiles | null> {
     try {
       return await profilesRepository.getCurrentProfile();
     } catch (error) {
@@ -57,7 +57,7 @@ export class ProfilesService {
   async updateProfile(
     userId: string,
     data: Partial<TablesUpdate<"profiles">>
-  ): Promise<UserProfile> {
+  ): Promise<Profiles> {
     try {
       // Validate input data
       const validationResult = updateProfileSchema.safeParse(data);
@@ -69,29 +69,8 @@ export class ProfilesService {
       const sanitizedData = this.sanitizeProfileData(validationResult.data);
 
       // Update profile
-      const updateResult = await profilesRepository.updateByUserId(
+      const updateResult = await profilesRepository.update(
         userId,
-        sanitizedData
-      );
-
-      return updateResult;
-    } catch (error) {
-      throw normalizeError(error);
-    }
-  }
-
-  /**
-   * Update current user's profile
-   */
-  async updateCurrentProfile(
-    data: Partial<TablesUpdate<"profiles">>
-  ): Promise<UserProfile> {
-    try {
-      // Sanitize and process data (skip validation for onboarding fields)
-      const sanitizedData = this.sanitizeProfileData(data);
-
-      // Update current user's profile
-      const updateResult = await profilesRepository.updateCurrentProfile(
         sanitizedData
       );
 
@@ -106,7 +85,7 @@ export class ProfilesService {
    */
   async profileExists(userId: string): Promise<boolean> {
     try {
-      return await profilesRepository.existsByUserId(userId);
+      return await profilesRepository.existsById(userId);
     } catch (error) {
       throw normalizeError(error);
     }
@@ -117,7 +96,7 @@ export class ProfilesService {
    */
   async deleteProfile(userId: string): Promise<void> {
     try {
-      await profilesRepository.deleteByUserId(userId);
+      await profilesRepository.delete(userId);
     } catch (error) {
       throw normalizeError(error);
     }

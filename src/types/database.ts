@@ -103,10 +103,10 @@ export type Database = {
           courses: string[] | null
           created_at: string | null
           email: string | null
-          full_name: string | null
+          full_name: string
           id: string
           onboarding_completed: boolean | null
-          role: Database["public"]["Enums"]["user_role"]
+          role: Database["public"]["Enums"]["user_role"] | null
           user_id: string
         }
         Insert: {
@@ -114,10 +114,10 @@ export type Database = {
           courses?: string[] | null
           created_at?: string | null
           email?: string | null
-          full_name?: string | null
+          full_name?: string
           id?: string
           onboarding_completed?: boolean | null
-          role: Database["public"]["Enums"]["user_role"]
+          role?: Database["public"]["Enums"]["user_role"] | null
           user_id: string
         }
         Update: {
@@ -125,10 +125,10 @@ export type Database = {
           courses?: string[] | null
           created_at?: string | null
           email?: string | null
-          full_name?: string | null
+          full_name?: string
           id?: string
           onboarding_completed?: boolean | null
-          role?: Database["public"]["Enums"]["user_role"]
+          role?: Database["public"]["Enums"]["user_role"] | null
           user_id?: string
         }
         Relationships: []

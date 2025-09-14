@@ -1,18 +1,23 @@
 import { Modal, ModalProps } from "@/components/ui/Modal";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-const useModal = ({ onClose, title, children, ...props }: ModalProps) => {
+export const useModal = ({
+  onClose,
+  title,
+  children,
+  ...props
+}: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openModal = () => {
+  const openModal = useCallback(() => {
     setIsModalOpen(true);
-  };
-  const closeModal = () => {
+  }, []);
+  const closeModal = useCallback(() => {
     setIsModalOpen(false);
-    onClose && onClose();
-  };
+    onClose?.();
+  }, [onClose]);
 
   const ModalComponent = createPortal(
     <Modal
@@ -34,5 +39,3 @@ const useModal = ({ onClose, title, children, ...props }: ModalProps) => {
     isModalOpen,
   };
 };
-
-export default useModal;

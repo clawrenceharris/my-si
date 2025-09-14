@@ -3,19 +3,18 @@ import { useAuth } from "@/shared/hooks/use-auth";
 import "../globals.css";
 
 import { QueryProvider, UserProvider } from "../providers";
+import { useProfile } from "@/shared";
+import { ErrorState } from "@/components/states";
+import { useRouter } from "next/navigation";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user } = useAuth();
-
-  if (!user) return null;
-
   return (
     <QueryProvider>
-      <UserProvider user={user}>
+      <UserProvider>
         <div className="flex min-h-screen flex-col">
           {/* Page Content */}
 
