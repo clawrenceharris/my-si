@@ -1,6 +1,7 @@
 import { normalizeError } from "@/shared/errors";
 import type { OnboardingData } from "./onboarding.types";
-import { profileService } from "./profiles.service";
+import { ProfileService } from "./profile.service";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 interface OnboardingResult {
   success: boolean;
@@ -9,7 +10,12 @@ interface OnboardingResult {
 
 const STORAGE_KEY = "onboarding_progress";
 
-export const onboardingService = {
+export class OnboardingService {
+  private profileService;
+  constructor(client: SupabaseClient) {
+    this.profileService = new ProfileService(client);
+  }
+
   /**
    * Complete the onboarding process by saving user data
    */
@@ -32,7 +38,7 @@ export const onboardingService = {
       }
 
       // Update user profile
-      await profileService.updateCurrentProfile(profileUpdates);
+      // await this.profileService.updateCurrentProfile(profileUpdates);
 
       // Clear progress from storage
       await this.clearProgress();
@@ -49,7 +55,7 @@ export const onboardingService = {
 
       return { success: false, error: errorMessage };
     }
-  },
+  }
 
   /**
    * Save onboarding progress to local storage
@@ -63,7 +69,7 @@ export const onboardingService = {
     } catch {
       return { success: false, error: "Failed to save progress" };
     }
-  },
+  }
 
   /**
    * Load onboarding progress from local storage
@@ -80,7 +86,7 @@ export const onboardingService = {
     } catch {
       return {};
     }
-  },
+  }
 
   /**
    * Clear onboarding progress from local storage
@@ -93,20 +99,20 @@ export const onboardingService = {
     } catch {
       // Silently fail - not critical
     }
-  },
+  }
 
   /**
    * Check if user needs onboarding
    */
-  async needsOnboarding(): Promise<boolean> {
+  async needsOnboarding(userId: string): Promise<boolean> {
     try {
-      const profile = await profileService.getCurrentProfile();
+      const profile = await this.profileService.getProfile(userId);
 
       // User needs onboarding if onboarding_complete is false or null
-      return !profile?.onboarding_complete;
+      return !profile?.onboarding_completed;
     } catch {
       // If we can't check, assume they need onboarding
       return true;
     }
-  },
-};
+  }
+}

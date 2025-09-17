@@ -1,4 +1,5 @@
-import { profileService } from "@/features/profile/domain/profiles.service";
+import { ProfileService } from "@/features/profile/domain/profile.service";
+import { useSupabaseClient } from "@/providers/SupabaseClientProvider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 /**
@@ -6,12 +7,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
  */
 export function useProfile(userId?: string) {
   const queryClient = useQueryClient();
+  const supabaseClient = useSupabaseClient();
+  const profileService = new ProfileService(supabaseClient);
+
   // Query for getting user profile
   const profileQuery = useQuery({
     queryKey: ["profile", userId],
     queryFn: async () => {
       if (!userId) return null;
-      const data = await profileService.getCurrentProfile();
+      const data = await profileService.getProfile(userId);
       return data;
     },
     enabled: !!userId,
