@@ -2,8 +2,8 @@
 
 import { useSupabaseClient } from "@/providers/SupabaseClientProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { SessionService } from "../domain/session.service";
-import { CreateSessionInput } from "../domain/session.schema";
+import { SessionService } from "../domain/sessions.service";
+import { SessionsInsert } from "@/types/tables";
 
 export function useSession(sessionId?: string) {
   const client = useSupabaseClient();
@@ -20,7 +20,7 @@ export function useSession(sessionId?: string) {
 
   // Mutations
   const createSession = useMutation({
-    mutationFn: async (data: CreateSessionInput) => {
+    mutationFn: async (data: SessionsInsert) => {
       return await service.createSession(data);
     },
     onSuccess: () => {
@@ -41,11 +41,16 @@ export function useSession(sessionId?: string) {
   });
 
   return {
+    isLoading: sessionQuery.isLoading,
     session: sessionQuery.data,
+    isCreatingSession: createSession.isPending,
+    isDeletingSession: deleteSession.isPending,
+    error: sessionQuery.error,
+    createSessionError: createSession.error,
+    deleteSessionError: deleteSession.error,
+
     createSession: createSession.mutateAsync,
     deleteSession: deleteSession.mutateAsync,
-    isLoading: sessionQuery.isLoading,
-    error: sessionQuery.error,
     refetch: sessionQuery.refetch,
   };
 }

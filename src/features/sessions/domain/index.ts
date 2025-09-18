@@ -1,2 +1,2 @@
-export * from "./session.schema";
-export * from "./session.service";
+export * from "./sessions.schema";
+export * from "./sessions.service";

@@ -125,7 +125,7 @@ export type Database = {
           title: string
         }
         Insert: {
-          card_slug: string
+          card_slug?: string
           category: string
           created_at?: string | null
           id?: string
@@ -290,77 +290,94 @@ export type Database = {
         Row: {
           actual_end: string | null
           actual_start: string | null
-          course_name: string
+          course_name: string | null
           created_at: string
           description: string | null
           id: string
-          scheduled_start: string
-          session_code: string
+          leader_id: string | null
+          lesson_id: string | null
+          scheduled_start: string | null
+          session_code: string | null
           status: Database["public"]["Enums"]["session_status"]
-          title: string
-          topic: string
+          topic: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           actual_end?: string | null
           actual_start?: string | null
-          course_name: string
+          course_name?: string | null
           created_at?: string
           description?: string | null
           id?: string
-          scheduled_start: string
-          session_code: string
+          leader_id?: string | null
+          lesson_id?: string | null
+          scheduled_start?: string | null
+          session_code?: string | null
           status?: Database["public"]["Enums"]["session_status"]
-          title: string
-          topic: string
+          topic?: string | null
           updated_at?: string
-          user_id?: string
         }
         Update: {
           actual_end?: string | null
           actual_start?: string | null
-          course_name?: string
+          course_name?: string | null
           created_at?: string
           description?: string | null
           id?: string
-          scheduled_start?: string
-          session_code?: string
+          leader_id?: string | null
+          lesson_id?: string | null
+          scheduled_start?: string | null
+          session_code?: string | null
           status?: Database["public"]["Enums"]["session_status"]
-          title?: string
-          topic?: string
+          topic?: string | null
           updated_at?: string
-          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sessions_leader_id_fkey"
+            columns: ["leader_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       strategy_cards: {
         Row: {
           category: string | null
+          course_tags: string[]
           created_at: string | null
           good_for: string[]
           id: string
-          slug: string | null
+          session_size: Database["public"]["Enums"]["session_size"]
+          slug: string
           steps: string[]
           title: string
+          virtual_friendly: boolean
         }
         Insert: {
           category?: string | null
+          course_tags?: string[]
           created_at?: string | null
           good_for?: string[]
           id?: string
-          slug?: string | null
+          session_size?: Database["public"]["Enums"]["session_size"]
+          slug?: string
           steps: string[]
           title: string
+          virtual_friendly?: boolean
         }
         Update: {
           category?: string | null
+          course_tags?: string[]
           created_at?: string | null
           good_for?: string[]
           id?: string
-          slug?: string | null
+          session_size?: Database["public"]["Enums"]["session_size"]
+          slug?: string
           steps?: string[]
           title?: string
+          virtual_friendly?: boolean
         }
         Relationships: []
       }
@@ -468,6 +485,7 @@ export type Database = {
     }
     Enums: {
       lesson_phase: "warmup" | "workout" | "closer"
+      session_size: "1+" | "2+" | "4+" | "2-4" | "4-8" | "8+"
       session_status: "scheduled" | "active" | "completed" | "cancelled"
       user_role: "si_leader" | "student" | "coordinator"
     }
@@ -598,6 +616,7 @@ export const Constants = {
   public: {
     Enums: {
       lesson_phase: ["warmup", "workout", "closer"],
+      session_size: ["1+", "2+", "4+", "2-4", "4-8", "8+"],
       session_status: ["scheduled", "active", "completed", "cancelled"],
       user_role: ["si_leader", "student", "coordinator"],
     },

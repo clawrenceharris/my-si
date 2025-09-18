@@ -5,6 +5,8 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Label,
+  Switch,
   Textarea,
 } from "@/components/ui";
 import { CreateSessionInput } from "@/features/sessions/domain";
@@ -13,6 +15,8 @@ import { useFormContext } from "react-hook-form";
 export function CreateSessionForm() {
   const {
     control,
+    setValue,
+    getValues,
     formState: { errors },
   } = useFormContext<CreateSessionInput>();
 
@@ -21,16 +25,16 @@ export function CreateSessionForm() {
       <FormField
         name="topic"
         control={control}
-        defaultValue=""
         render={({ field }) => (
           <FormItem>
             <FormLabel className="sr-only">Topic</FormLabel>
             <FormControl>
-              <Textarea placeholder="Topic" {...field} />
+              <Input placeholder="Topic" {...field} />
             </FormControl>
           </FormItem>
         )}
       />
+      {errors.topic && <FormMessage>{errors.topic.message}</FormMessage>}
       <FormField
         name="description"
         defaultValue=""
@@ -44,10 +48,12 @@ export function CreateSessionForm() {
           </FormItem>
         )}
       />
-
-      <div>
+      {errors.description && (
+        <FormMessage>{errors.description.message}</FormMessage>
+      )}
+      <div className="flex gap-4">
         <FormField
-          name="startDate"
+          name="start_date"
           defaultValue=""
           control={control}
           render={({ field }) => (
@@ -61,23 +67,36 @@ export function CreateSessionForm() {
         />
 
         <FormField
-          name="startTime"
+          name="start_time"
           defaultValue=""
           control={control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="sr-only">Chat message</FormLabel>
+              <FormLabel>Start Time</FormLabel>
               <FormControl>
                 <Input {...field} type="time" />
               </FormControl>
             </FormItem>
           )}
         />
-
-        <FormMessage>
-          {errors.startDate?.message || errors.startTime?.message}
-        </FormMessage>
       </div>
+      {(errors.start_date || errors.start_time) && (
+        <FormMessage>
+          {errors.start_date?.message || errors.start_time?.message}
+        </FormMessage>
+      )}
+
+      <FormItem className="flex gap-3">
+        <Label htmlFor="virtual">Virtual:</Label>
+        <FormControl>
+          <Switch
+            id="virtual"
+            onToggle={() => setValue("virtual", !getValues("virtual"))}
+            defaultChecked={false}
+          />
+        </FormControl>
+      </FormItem>
+      {errors.virtual && <FormMessage>{errors.virtual.message}</FormMessage>}
     </>
   );
 }

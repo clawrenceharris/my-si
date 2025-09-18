@@ -77,9 +77,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </header>
           <QueryProvider>
             <SupabaseClientProvider>
-              <VideoClientProvider>
-                <main>{children}</main>
-              </VideoClientProvider>
+              {/* <VideoClientProvider> */}
+              <main>{children}</main>
+              {/* </VideoClientProvider> */}
             </SupabaseClientProvider>
           </QueryProvider>
         </body>

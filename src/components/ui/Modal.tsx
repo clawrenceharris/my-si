@@ -11,15 +11,26 @@ import {
 
 export interface ModalProps {
   onClose?: () => void;
-  headerRight?: ReactNode;
   children?: ReactNode;
   contentStyle?: CSSProperties;
   title: string;
+  hidesDescription?: boolean;
   isOpen?: boolean;
   description?: string;
 }
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(
-  ({ contentStyle, title, isOpen, onClose, description, children }, ref) => {
+  (
+    {
+      contentStyle,
+      hidesDescription,
+      title,
+      isOpen,
+      onClose,
+      description,
+      children,
+    },
+    ref
+  ) => {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogTrigger asChild>
@@ -29,7 +40,11 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
           <DialogHeader>
             {title && <DialogTitle>{title}</DialogTitle>}
             {description && (
-              <DialogDescription>{description}</DialogDescription>
+              <DialogDescription
+                className={`${hidesDescription ? "sr-only" : ""}`}
+              >
+                {description}
+              </DialogDescription>
             )}
           </DialogHeader>
 

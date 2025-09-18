@@ -51,7 +51,7 @@ export function FormLayout<T extends FieldValues>({
   isOpen = true,
   description,
   descriptionStyle,
-  enableBeforeUnloadProtection = false,
+  enableBeforeUnloadProtection = true,
   ...formProps
 }: FormLayoutProps<T>) {
   const form = useForm<T>({
