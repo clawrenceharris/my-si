@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   }
 
   const client = createClerkSupabaseClient({
-    getTokenFn: () => getToken({ template: "supabase" }),
+    getTokenFn: () => getToken(),
   });
 
   // Pull data for prompting

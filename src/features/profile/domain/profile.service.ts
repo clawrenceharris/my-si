@@ -1,7 +1,7 @@
 import { AppErrorCode, normalizeError } from "@/shared";
 
 import { Profiles, ProfilesInsert, ProfilesUpdate } from "@/types/tables";
-import { ProfilesRepository } from "../data/profiles.repository";
+import { ProfilesRepository } from "../data";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -35,7 +35,7 @@ export class ProfileService {
         throw new Error(AppErrorCode.PERMISSION_DENIED);
       }
 
-      return await this.repository.getProfile(userId);
+      return await this.repository.getBy("user_id", userId);
     } catch (error) {
       throw normalizeError(error);
     }

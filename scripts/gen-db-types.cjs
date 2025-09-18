@@ -10,16 +10,16 @@ const DB_TYPES_FILE = path.join(TYPES_DIR, "database.ts");
 const TABLES_FILE = path.join(TYPES_DIR, "tables.ts");
 const PROJECT_ID = "zdbqltzqdvjpvppuibdw";
 
-// 1. Run Supabase codegen
+//Run Supabase codegen
 execSync(
   `supabase gen types typescript --project-id ${PROJECT_ID} --schema public > ${DB_TYPES_FILE}`,
   { stdio: "inherit" }
 );
 
-// 2. Read database.ts text
+//Read database.ts text
 const fileContents = fs.readFileSync(DB_TYPES_FILE, "utf-8");
 
-// 3. Extract table names (look for "<tableName>: { Row:")
+//Extracts table names (looks for "<tableName>: { Row:")
 const tableRegex = /^(\s*)(\w+):\s*{\s*Row:/gm;
 const tableNames = [];
 let match;
@@ -34,12 +34,25 @@ if (tableNames.length === 0) {
   );
 }
 
-// 4. Generate tables.ts file
+//Extracts enum names (looks for "Enums: { <enumName>:")
+const enumRegex = /^\s*(\w+):\s*\([\s\S]*?\)/gm;
+const enumBlockMatch = fileContents.match(/Enums:\s*{([^}]*)}/m);
+const enumNames = [];
+
+if (enumBlockMatch) {
+  let enumMatch;
+  while ((enumMatch = enumRegex.exec(enumBlockMatch[1])) !== null) {
+    enumNames.push(enumMatch[1]);
+  }
+}
+
+//Generate tables.ts file
 let output = `// Auto-generated. Do not edit.
 import { Database } from "./database";
 
 `;
 
+// Tables
 for (const table of tableNames) {
   const pascalName = table
     .split("_")
@@ -51,5 +64,17 @@ for (const table of tableNames) {
   output += `export type ${pascalName}Update = Database["public"]["Tables"]["${table}"]["Update"];\n\n`;
 }
 
+// Enums
+for (const enumName of enumNames) {
+  const pascalName = enumName
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join("");
+
+  output += `export type ${pascalName}Enum = Database["public"]["Enums"]["${enumName}"];\n`;
+}
+
 fs.writeFileSync(TABLES_FILE, output, "utf-8");
-console.log(`Wrote ${TABLES_FILE}`);
+console.log(
+  `Wrote ${TABLES_FILE} with ${tableNames.length} tables and ${enumNames.length} enums`
+);

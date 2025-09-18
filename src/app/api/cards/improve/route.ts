@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const client = createClerkSupabaseClient({
-    getTokenFn: () => getToken({ template: "supabase" }),
+    getTokenFn: () => getToken(),
   });
 
   // Load card copy

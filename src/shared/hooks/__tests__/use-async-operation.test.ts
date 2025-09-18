@@ -1,6 +1,6 @@
 import { describe, it, expect, jest } from "@jest/globals";
 import { renderHook, act } from "@testing-library/react";
-import { useAsyncOperation } from "../use-async-operation";
+import { useAsyncOperation } from "../useAsyncOperation";
 
 describe("useAsyncOperation", () => {
   it("should initialize with correct default state", () => {

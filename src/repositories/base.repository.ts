@@ -1,25 +1,11 @@
 // repositories/base.repository.ts
 import { SupabaseClient } from "@supabase/supabase-js";
-import camelcaseKeys from "camelcase-keys";
-import snakecaseKeys from "snakecase-keys";
 
-export abstract class BaseRepository<TDomain, TDb> {
+export abstract class BaseRepository<TDomain> {
   protected constructor(
     protected readonly client: SupabaseClient,
     protected readonly tableName: string
   ) {}
-
-  protected toDomain(row: TDb): TDomain {
-    return camelcaseKeys(row as Record<string, unknown>, {
-      deep: true,
-    }) as unknown as TDomain;
-  }
-
-  protected fromDomain(entity: TDomain): TDb {
-    return snakecaseKeys(entity as Record<string, unknown>, {
-      deep: true,
-    }) as unknown as TDb;
-  }
 
   async getById(id: string): Promise<TDomain | null> {
     const { data, error } = await this.client
@@ -66,7 +52,7 @@ export abstract class BaseRepository<TDomain, TDb> {
     }
   }
 
-  async create(data: Partial<TDomain>): Promise<TDomain> {
+  async create<T>(data: Partial<T>): Promise<TDomain> {
     const { data: result, error } = await this.client
       .from(this.tableName)
       .insert(data)
@@ -77,17 +63,16 @@ export abstract class BaseRepository<TDomain, TDb> {
     return result;
   }
 
-  async update(id: string, entity: Partial<TDomain>): Promise<TDomain> {
-    const row = this.fromDomain(entity as TDomain);
+  async update(id: string, updatedFields: Partial<TDomain>): Promise<TDomain> {
     const { data, error } = await this.client
       .from(this.tableName)
-      .update(row)
+      .update(updatedFields)
       .eq("id", id)
       .select()
       .single();
 
     if (error) throw error;
-    return this.toDomain(data as TDb);
+    return data;
   }
 
   async delete(id: string): Promise<void> {

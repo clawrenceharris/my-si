@@ -8,26 +8,13 @@ export default function createClerkSupabaseClient({
 }) {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
-      global: {
-        // Get the custom Supabase token from Clerk
-        fetch: async (url, options = {}) => {
-          const token = (await getTokenFn())?.trim();
+      // Session accessed from Clerk SDK, either as Clerk.session (vanilla
+      // JavaScript) or useSession (React)
 
-          // Insert the Clerk Supabase token into the headers
-          const headers = new Headers(options?.headers);
-
-          if (token) {
-            headers.set("Authorization", `Bearer ${token}`);
-          }
-          // Call the default fetch
-          return fetch(url, {
-            ...options,
-
-            headers,
-          });
-        },
+      accessToken: async () => {
+        return (await getTokenFn()) ?? null;
       },
     }
   );

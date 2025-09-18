@@ -294,14 +294,13 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
-          max_capacity: number | null
           scheduled_start: string
           session_code: string
-          si_leader_id: string
           status: Database["public"]["Enums"]["session_status"]
           title: string
           topic: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           actual_end?: string | null
@@ -310,14 +309,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          max_capacity?: number | null
           scheduled_start: string
           session_code: string
-          si_leader_id: string
           status?: Database["public"]["Enums"]["session_status"]
           title: string
           topic: string
           updated_at?: string
+          user_id?: string
         }
         Update: {
           actual_end?: string | null
@@ -326,14 +324,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          max_capacity?: number | null
           scheduled_start?: string
           session_code?: string
-          si_leader_id?: string
           status?: Database["public"]["Enums"]["session_status"]
           title?: string
           topic?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

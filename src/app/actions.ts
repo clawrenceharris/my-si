@@ -33,8 +33,10 @@ export async function getToken() {
 }
 
 export async function getUserIds(emailAddresses: string[]) {
-  const response = await clerkClient.users.getUserList({
+  const { data } = await (
+    await clerkClient()
+  ).users.getUserList({
     emailAddress: emailAddresses,
   });
-  return response.map((user) => user.id);
+  return data.map((user) => user.id);
 }

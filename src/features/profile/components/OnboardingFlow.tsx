@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
-import { useOnboarding } from "../hooks/use-onboarding";
+import { useOnboarding } from "../hooks/useOnboarding";
 import { OnboardingStep } from "../domain/onboarding.types";
 import { RoleSelectionStep } from "./RoleSelectionStep";
 import type { OnboardingData } from "../domain/onboarding.types";
