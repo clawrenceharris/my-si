@@ -11,3 +11,4 @@ export * from "./textarea";
 export * from "./tabs";
 export * from "./sidebar";
 export * from "./navigation-menu";
+export * from "./switch";

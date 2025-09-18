@@ -63,7 +63,7 @@ export abstract class BaseRepository<TDomain> {
     return result;
   }
 
-  async update(id: string, updatedFields: Partial<TDomain>): Promise<TDomain> {
+  async update<T>(id: string, updatedFields: T): Promise<TDomain> {
     const { data, error } = await this.client
       .from(this.tableName)
       .update(updatedFields)

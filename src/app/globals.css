@@ -42,6 +42,7 @@
   --color-destructive-100: var(--destructive-100);
   --color-destructive-500: var(--destructive-500);
   --color-destructive-700: var(--destructive-700);
+  --color-destructive: var(--destructive);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -125,6 +126,7 @@
   --destructive-100: #fee2e2;
   --destructive-500: #ef4444; /* anchor */
   --destructive-700: #b91c1c;
+  --destructive: #ef4444;
 
   /* Card */
   --card: #ffffff;
@@ -147,7 +149,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --input: #f3f5f8;
+  --input: #edeff1;
   --border: #e5e7eb;
   --ring: #93c5fd;
 }
@@ -159,25 +161,8 @@
   body {
     @apply min-h-screen from-primary-300  to-primary-600 text-foreground;
   }
-  input {
-    @apply from-[#f9fbfe] to-[#f8fafc] bg-gradient-to-l;
-  }
 }
 @layer components {
-  /* Even cards → notch at top */
-  .strategy-card::before {
-    content: "";
-    position: absolute;
-    top: -12px;
-    z-index: 9;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 24px;
-    height: 24px;
-    background: var(--background);
-    border-radius: 50%;
-    border: 2px solid var(--border);
-  }
   .strategy-card {
     @apply relative transition-shadow duration-200 rounded-2xl shadow-md border-2 max-w-xl
       hover:shadow-lg bg-secondary-50;

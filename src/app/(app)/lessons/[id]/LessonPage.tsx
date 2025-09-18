@@ -1,13 +1,19 @@
 "use client";
+import { Button } from "@/components/ui";
 import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  FormLayout,
-} from "@/components";
-import { CreateSessionForm } from "@/components/features";
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  DragOverlay,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  rectSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 import { LoadingState } from "@/components/states";
 import { useLesson } from "@/features/lessons/hooks/useLesson";
 import {
@@ -15,72 +21,88 @@ import {
   createSessionSchema,
 } from "@/features/sessions/domain";
 import { useSession } from "@/features/sessions/hooks";
-import { cn } from "@/lib/utils";
-import { useSupabaseClient } from "@/providers";
 import { useModal } from "@/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
-import clsx from "clsx";
 
+import { useEffect, useState } from "react";
 import {
-  Bookmark,
-  Brain,
-  Dumbbell,
-  Heart,
-  Lightbulb,
-  Redo2,
-  Wand2,
-} from "lucide-react";
-import { createElement } from "react";
+  restrictToFirstScrollableAncestor,
+  restrictToWindowEdges,
+} from "@dnd-kit/modifiers";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import { LessonCards } from "@/types/tables";
+import { FormLayout } from "@/components/forms";
+import {
+  CreateSessionForm,
+  SortableStrategyCard,
+  CardGhost,
+} from "@/components/features";
 
-export default function LessonPage({ id }: { id: string }) {
-  const { lesson, cards, isLoading, updateCardSteps } = useLesson(id);
-  const client = useSupabaseClient();
-  const { createSession } = useSession();
+export default function LessonPage({ lessonId }: { lessonId: string }) {
+  const { createSession, isCreatingSession: creatingSession } = useSession();
+  const [cards, setCards] = useState<LessonCards[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
-  const { modal: sessionCreationModal, openModal: openSessionCreationModal } =
-    useModal({
-      children: (
-        <FormLayout<CreateSessionInput>
-          defaultValues={{ lessonId: id }}
-          resolver={zodResolver(createSessionSchema)}
-          onSubmit={createSession}
-        >
-          <CreateSessionForm />
-        </FormLayout>
-      ),
-      title: "Create Session",
-    });
+  const { refetch, lesson, isLoading, updateCardSteps, reorderCards } =
+    useLesson(lessonId);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
+  );
+  useEffect(() => {
+    setCards(lesson?.cards || []);
+  }, [lesson]);
+
+  const {
+    modal: sessionCreationModal,
+    openModal: openSessionCreationModal,
+    closeModal: closeSessionCreationModal,
+  } = useModal({
+    title: "Create Session",
+    description: "Create a session from this lesson plan",
+    hidesDescription: true,
+    children: (
+      <FormLayout<CreateSessionInput>
+        onCancel={() => closeSessionCreationModal()}
+        isLoading={creatingSession}
+        defaultValues={{ topic: lesson?.topic || "" }}
+        resolver={zodResolver(createSessionSchema)}
+        onSubmit={async (data) => {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { start_date, start_time, ...rest } = data; //exclude start date and time
+
+            const startDate = `${data.start_date.split("T")[0]}T${
+              data.start_time
+            }`;
+            await createSession({
+              ...rest,
+              lesson_id: lesson?.id,
+              scheduled_start: new Date(startDate).toISOString(),
+            });
+            closeSessionCreationModal();
+          } catch {}
+        }}
+      >
+        <CreateSessionForm />
+      </FormLayout>
+    ),
+  });
 
   const improve = async (id: string) => {
-    await fetch("/api/cards/improve", {
-      method: "POST",
-      body: JSON.stringify({ lessonCardId: id }),
-    });
+    try {
+      await fetch("/api/cards/improve", {
+        method: "POST",
+        body: JSON.stringify({ lessonCardId: id }),
+      });
+      refetch();
+    } catch (error) {
+      console.error(
+        `An error occured." ${error instanceof Error ? error.message : ""}`
+      );
+    }
   };
-
   if (isLoading) return <LoadingState />;
-
-  const getCardColor = (phase: "warmup" | "workout" | "closer") => {
-    switch (phase) {
-      case "warmup":
-        return "bg-success-500";
-      case "workout":
-        return "bg-secondary-500";
-      case "closer":
-        return "bg-accent-400";
-    }
-  };
-
-  const getCardIcon = (phase: "warmup" | "workout" | "closer") => {
-    switch (phase) {
-      case "warmup":
-        return <Brain />;
-      case "workout":
-        return <Dumbbell />;
-      default:
-        return <Lightbulb />;
-    }
-  };
 
   return (
     <div className="p-6 space-y-12">
@@ -90,114 +112,65 @@ export default function LessonPage({ id }: { id: string }) {
 
         <Button onClick={openSessionCreationModal}>Create Session</Button>
       </div>
-      <div className="flex mx-auto max-w-lg lg:max-w-6xl gap-5 flex-col lg:flex-row ">
-        {cards.map((c) => (
-          <Card className="strategy-card flex-1 p-0" key={c.id}>
-            <CardHeader
-              className={cn(
-                `flex relative text-background items-center p-3 gap-6 rounded-tl-2xl rounded-tr-2xl`,
-                `${getCardColor(c.phase)}`
-              )}
-            >
-              <div className="min-w-[40px] min-h-[40px] bg-foreground/20 rounded-full flex items-center justify-center">
-                {getCardIcon(c.phase)}
-              </div>
-              <div className="w-full">
-                <div>
-                  <h2 className="font-bold text-xl">{c.title} </h2>
-                </div>
-                <div className="flex items-center  justify-between">
-                  <span className="uppercase font-light text-background/70 text-sm">
-                    {c.phase}
-                  </span>
-                  <div className="flex">
-                    <Button
-                      className="rounded-full"
-                      variant={"ghost"}
-                      size={"sm"}
-                      aria-label="Add to favorites"
-                      onMouseEnter={(e) => {
-                        const text = document.createElement("p");
-                        text.textContent = "Save";
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToFirstScrollableAncestor, restrictToWindowEdges]}
+        onDragStart={({ active }) => {
+          setActiveId(String(active.id));
+          document.body.style.overscrollBehavior = "contain";
+          document.body.style.cursor = "grabbing";
+        }}
+        onDragEnd={({ active, over }) => {
+          document.body.style.overscrollBehavior = "";
+          document.body.style.cursor = "";
+          setActiveId(null);
 
-                        e.currentTarget.appendChild(text);
-                      }}
-                      onMouseLeave={(e) => {
-                        if (e.currentTarget.lastChild) {
-                          e.currentTarget.removeChild(
-                            e.currentTarget.lastChild
-                          );
-                        }
-                      }}
-                    >
-                      <Bookmark />
-                    </Button>
+          if (!over || active.id === over.id) return;
+          const oldIndex = cards.findIndex((c) => c.id === active.id);
+          const newIndex = cards.findIndex((c) => c.id === over.id);
+          const next = arrayMove(cards, oldIndex, newIndex).map((c, i) => ({
+            ...c,
+            position: i,
+          }));
+          reorderCards(next);
+          setCards(next);
+        }}
+        onDragCancel={() => {
+          document.body.style.overscrollBehavior = "";
+          document.body.style.cursor = "";
+          setActiveId(null);
+        }}
+      >
+        <SortableContext
+          items={cards}
+          strategy={
+            isMobile ? verticalListSortingStrategy : rectSortingStrategy
+          }
+        >
+          <ul className=" grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-md lg:max-w-7xl m-auto">
+            {cards.map((card) => (
+              <SortableStrategyCard
+                key={card.id}
+                onCardStepsUpdate={(steps) =>
+                  updateCardSteps({ id: card.id, steps })
+                }
+                onImproveClick={async () => await improve(card.id)}
+                card={card}
+              />
+            ))}
+          </ul>
+        </SortableContext>
 
-                    <Button
-                      className="rounded-full"
-                      variant={"ghost"}
-                      onClick={async () => await improve(c.id)}
-                      size={"sm"}
-                      aria-label="Add to favorites"
-                      onMouseEnter={(e) => {
-                        const text = document.createElement("p");
-                        text.textContent = "AI Enhance";
-
-                        e.currentTarget.appendChild(text);
-                      }}
-                      onMouseLeave={(e) => {
-                        if (e.currentTarget.lastChild) {
-                          e.currentTarget.removeChild(
-                            e.currentTarget.lastChild
-                          );
-                        }
-                      }}
-                    >
-                      <Wand2 />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <ol className="text-foreground/80 space-y-4">
-                {c.steps.map((s: string, i: number) => (
-                  <li className="flex items-center gap-4 " key={i}>
-                    <div
-                      className={`${clsx({
-                        "text-success-500 bg-success-100": c.phase === "warmup",
-                        "text-secondary-500 bg-secondary-100":
-                          c.phase === "workout",
-                        "text-accent-400 bg-accent-100": c.phase === "closer",
-                      })} text-pr min-w-7 min-h-7  rounded-full items-center justify-center flex`}
-                    >
-                      <span>{i + 1}</span>
-                    </div>
-
-                    <p
-                      className="hover:bg-foreground/4 p-3 rounded-md max-w-sm"
-                      contentEditable
-                      suppressContentEditableWarning
-                      onBlur={(e) =>
-                        updateCardSteps({
-                          cardId: c.id,
-                          steps: [
-                            ...c.steps.slice(0, i),
-                            e.currentTarget.textContent || "",
-                            ...c.steps.slice(i + 1),
-                          ],
-                        })
-                      }
-                    >
-                      {s}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        {/*This lifts the dragged card out of the layout for buttery effect */}
+        <DragOverlay dropAnimation={{ duration: 150 }}>
+          {activeId ? (
+            <CardGhost
+              position={cards.find((c) => c.id === activeId)!.position}
+            />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 }

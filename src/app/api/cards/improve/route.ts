@@ -23,9 +23,12 @@ export async function POST(req: NextRequest) {
     .eq("id", lessonCardId)
     .single();
   if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message + "This Error " },
+      { status: 500 }
+    );
 
-  const sys = `Rewrite the steps for clarity and actionability. Keep 3–6 concise steps. Return JSON: { "steps": string[] }`;
+  const sys = `These steps are apart of a teaching or facilitation strategy for college Supplmenetal Instruction leaders to use in their study sessions with other students. Edit one or more steps to include a creative twist to the original activity. Keep 3–6 concise steps. Return JSON: { "steps": string[] }`;
   const usr = `Title: ${card.title}\nCurrent steps:\n${card.steps
     .map((s: string, i: number) => `${i + 1}. ${s}`)
     .join("\n")}`;
@@ -38,6 +41,7 @@ export async function POST(req: NextRequest) {
     ],
     response_format: { type: "json_object" },
   });
+  console.log(resp.choices[0].message);
   const out = JSON.parse(resp.choices[0].message?.content ?? "{}") as {
     steps: string[];
   };
@@ -45,7 +49,8 @@ export async function POST(req: NextRequest) {
     .from("lesson_cards")
     .update({ steps: out.steps })
     .eq("id", lessonCardId);
-  if (up) return NextResponse.json({ error: up.message }, { status: 500 });
+  if (up)
+    return NextResponse.json({ error: up.message + " Error" }, { status: 500 });
 
   return NextResponse.json({ ok: true, steps: out.steps });
 }
