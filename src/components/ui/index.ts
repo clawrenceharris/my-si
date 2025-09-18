@@ -6,6 +6,8 @@ export * from "./label";
 export * from "./input";
 export * from "./popover";
 export * from "./dialog";
-
+export * from "./dropdown-menu";
+export * from "./textarea";
 export * from "./tabs";
-export * from "./calendar";
+export * from "./sidebar";
+export * from "./navigation-menu";

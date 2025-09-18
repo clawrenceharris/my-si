@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_flows: {
+        Row: {
+          card_slug: string
+          created_at: string | null
+          id: string
+          instruction: string
+          interaction_type: string
+          step_number: number
+        }
+        Insert: {
+          card_slug: string
+          created_at?: string | null
+          id?: string
+          instruction: string
+          interaction_type: string
+          step_number: number
+        }
+        Update: {
+          card_slug?: string
+          created_at?: string | null
+          id?: string
+          instruction?: string
+          interaction_type?: string
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_flows_card_slug_fkey"
+            columns: ["card_slug"]
+            isOneToOne: false
+            referencedRelation: "strategy_cards"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      activity_types: {
+        Row: {
+          description: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          title?: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       confusion_feedback: {
         Row: {
           created_at: string
@@ -59,43 +112,76 @@ export type Database = {
           },
         ]
       }
-      lessons: {
+      lesson_cards: {
         Row: {
-          content: Json
-          created_at: string
-          generated_by: string
+          card_slug: string
+          category: string
+          created_at: string | null
           id: string
-          session_id: string
-          topic: string
-          updated_at: string
+          lesson_id: string
+          phase: Database["public"]["Enums"]["lesson_phase"]
+          position: number
+          steps: string[]
+          title: string
         }
         Insert: {
-          content: Json
-          created_at?: string
-          generated_by: string
+          card_slug: string
+          category: string
+          created_at?: string | null
           id?: string
-          session_id: string
-          topic: string
-          updated_at?: string
+          lesson_id: string
+          phase: Database["public"]["Enums"]["lesson_phase"]
+          position: number
+          steps: string[]
+          title: string
         }
         Update: {
-          content?: Json
-          created_at?: string
-          generated_by?: string
+          card_slug?: string
+          category?: string
+          created_at?: string | null
           id?: string
-          session_id?: string
-          topic?: string
-          updated_at?: string
+          lesson_id?: string
+          phase?: Database["public"]["Enums"]["lesson_phase"]
+          position?: number
+          steps?: string[]
+          title?: string
         }
         Relationships: [
           {
-            foreignKeyName: "ai_lessons_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: "lesson_cards_lesson_id_fkey"
+            columns: ["lesson_id"]
             isOneToOne: false
-            referencedRelation: "sessions"
+            referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
         ]
+      }
+      lessons: {
+        Row: {
+          created_at: string | null
+          id: string
+          mode: string
+          topic: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mode?: string
+          topic: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mode?: string
+          topic?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -107,7 +193,7 @@ export type Database = {
           id: string
           onboarding_completed: boolean | null
           role: Database["public"]["Enums"]["user_role"] | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -118,7 +204,7 @@ export type Database = {
           id?: string
           onboarding_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -129,7 +215,7 @@ export type Database = {
           id?: string
           onboarding_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -168,6 +254,38 @@ export type Database = {
           },
         ]
       }
+      session_inputs: {
+        Row: {
+          assigned_to: string | null
+          id: string
+          input: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          id?: string
+          input: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          id?: string
+          input?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_inputs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
           actual_end: string | null
@@ -176,14 +294,13 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
-          max_capacity: number | null
           scheduled_start: string
           session_code: string
-          si_leader_id: string
           status: Database["public"]["Enums"]["session_status"]
           title: string
           topic: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           actual_end?: string | null
@@ -192,14 +309,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          max_capacity?: number | null
           scheduled_start: string
           session_code: string
-          si_leader_id: string
           status?: Database["public"]["Enums"]["session_status"]
           title: string
           topic: string
           updated_at?: string
+          user_id?: string
         }
         Update: {
           actual_end?: string | null
@@ -208,14 +324,43 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          max_capacity?: number | null
           scheduled_start?: string
           session_code?: string
-          si_leader_id?: string
           status?: Database["public"]["Enums"]["session_status"]
           title?: string
           topic?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      strategy_cards: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          good_for: string[]
+          id: string
+          slug: string | null
+          steps: string[]
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          good_for?: string[]
+          id?: string
+          slug?: string | null
+          steps: string[]
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          good_for?: string[]
+          id?: string
+          slug?: string | null
+          steps?: string[]
+          title?: string
         }
         Relationships: []
       }
@@ -296,6 +441,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      requesting_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       search_lessons: {
         Args: {
           limit_count?: number
@@ -318,6 +467,7 @@ export type Database = {
       }
     }
     Enums: {
+      lesson_phase: "warmup" | "workout" | "closer"
       session_status: "scheduled" | "active" | "completed" | "cancelled"
       user_role: "si_leader" | "student" | "coordinator"
     }
@@ -447,6 +597,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      lesson_phase: ["warmup", "workout", "closer"],
       session_status: ["scheduled", "active", "completed", "cancelled"],
       user_role: ["si_leader", "student", "coordinator"],
     },
