@@ -76,7 +76,6 @@ export function FormLayout<T extends FieldValues>({
 
   const handleSubmit = async (data: T) => {
     try {
-      console.log("submitting");
       await onSubmit?.(data);
     } catch (error) {
       console.error(error);
