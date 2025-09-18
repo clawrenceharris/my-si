@@ -11,6 +11,7 @@ import {
 import { Form, FormDescription, FormMessage } from "../ui/form";
 import { getUserErrorMessage } from "@/shared";
 import { Button } from "../ui";
+import { Loader2 } from "lucide-react";
 
 export interface FormLayoutProps<T extends FieldValues>
   extends UseFormProps<T> {
@@ -32,6 +33,7 @@ export interface FormLayoutProps<T extends FieldValues>
   descriptionStyle?: React.CSSProperties;
   defaultValues?: DefaultValues<T>;
   enableBeforeUnloadProtection?: boolean;
+  submitButtonClassName?: string;
 }
 
 export function FormLayout<T extends FieldValues>({
@@ -43,12 +45,13 @@ export function FormLayout<T extends FieldValues>({
   onSubmit,
   onCancel,
   resolver,
+  submitButtonClassName,
   isLoading = false,
   mode = "onSubmit",
   isOpen = true,
   description,
   descriptionStyle,
-  enableBeforeUnloadProtection = false,
+  enableBeforeUnloadProtection = true,
   ...formProps
 }: FormLayoutProps<T>) {
   const form = useForm<T>({
@@ -112,35 +115,8 @@ export function FormLayout<T extends FieldValues>({
           )}
 
           {showsSubmitButton && (
-            <Button
-              onClick={() => console.log("onsubmit")}
-              type="submit"
-              size={"lg"}
-            >
-              {isLoading ? (
-                <svg
-                  className="w-4 h-4 animate-spin"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-              ) : (
-                submitText
-              )}
+            <Button type="submit" className={submitButtonClassName} size={"lg"}>
+              {isLoading ? <Loader2 className="animate-spin" /> : submitText}
             </Button>
           )}
         </div>

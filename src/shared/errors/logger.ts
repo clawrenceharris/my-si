@@ -1,18 +1,7 @@
 import { AppError } from "./types";
 
-// Get current user ID (placeholder - implement based on your auth system)
-function getCurrentUserId(): string | null {
-  // This would typically come from your auth context
-  return null;
-}
-
-// Send to monitoring service (placeholder)
-function sendToMonitoringService(errorLog: any): void {
-  // This would integrate with Sentry, LogRocket, or other monitoring service
-  console.log("Would send to monitoring service:", errorLog);
-}
-
-// Centralized error logging
+// Central error logging
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function logError(error: AppError, context?: Record<string, any>) {
   const errorLog = {
     timestamp: error.timestamp,
@@ -27,16 +16,11 @@ export function logError(error: AppError, context?: Record<string, any>) {
     userAgent:
       typeof navigator !== "undefined" ? navigator.userAgent : "server",
     url: typeof window !== "undefined" ? window.location.href : "server",
-    userId: getCurrentUserId(),
   };
 
   // Log to console in development
   if (process.env.NODE_ENV === "development") {
     console.error("App Error:", errorLog);
   }
-
-  // Send to monitoring service in production
-  if (process.env.NODE_ENV === "production") {
-    sendToMonitoringService(errorLog);
-  }
+  //Production logic will be under here
 }

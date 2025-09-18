@@ -1,6 +1,6 @@
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 import { renderHook, act } from "@testing-library/react";
-import { useErrorHandler } from "../use-error-handler";
+import { useErrorHandler } from "../useErrorHandler";
 import {
   AppError,
   ErrorSeverity,
