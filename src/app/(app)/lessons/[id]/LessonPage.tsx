@@ -16,13 +16,8 @@ import {
 } from "@dnd-kit/sortable";
 import { LoadingState } from "@/components/states";
 import { useLesson } from "@/features/lessons/hooks/useLesson";
-import {
-  CreateSessionInput,
-  createSessionSchema,
-} from "@/features/sessions/domain";
-import { useSession } from "@/features/sessions/hooks";
+
 import { useModal } from "@/shared";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useEffect, useState } from "react";
 import {
@@ -31,19 +26,24 @@ import {
 } from "@dnd-kit/modifiers";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { LessonCards } from "@/types/tables";
-import { FormLayout } from "@/components/forms";
 import {
   CreateSessionForm,
   SortableStrategyCard,
   CardGhost,
 } from "@/components/features";
+import { useSessions } from "@/features/sessions/hooks";
+import { useUser } from "@/providers";
+import { CreateSessionInput } from "@/features/sessions/domain";
+import { useVirtualMeeting } from "@/features/sessions/hooks/useVirtualMeeting";
+import { FormLayout } from "@/components/forms";
 
 export default function LessonPage({ lessonId }: { lessonId: string }) {
-  const { createSession, isCreatingSession: creatingSession } = useSession();
   const [cards, setCards] = useState<LessonCards[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const isMobile = useIsMobile();
-
+  const { user } = useUser();
+  const { addSession } = useSessions(user.id);
+  const { createVirtualMeeting } = useVirtualMeeting();
   const { refetch, lesson, isLoading, updateCardSteps, reorderCards } =
     useLesson(lessonId);
   const sensors = useSensors(
@@ -63,31 +63,41 @@ export default function LessonPage({ lessonId }: { lessonId: string }) {
     hidesDescription: true,
     children: (
       <FormLayout<CreateSessionInput>
-        onCancel={() => closeSessionCreationModal()}
-        isLoading={creatingSession}
         defaultValues={{ topic: lesson?.topic || "" }}
-        resolver={zodResolver(createSessionSchema)}
-        onSubmit={async (data) => {
-          try {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { start_date, start_time, ...rest } = data; //exclude start date and time
-
-            const startDate = `${data.start_date.split("T")[0]}T${
-              data.start_time
-            }`;
-            await createSession({
-              ...rest,
-              lesson_id: lesson?.id,
-              scheduled_start: new Date(startDate).toISOString(),
-            });
-            closeSessionCreationModal();
-          } catch {}
-        }}
+        onCancel={() => closeSessionCreationModal()}
+        isLoading={addSession.isPending}
+        onSubmit={async (data) => await handleSessionSubmit(data)}
       >
         <CreateSessionForm />
       </FormLayout>
     ),
   });
+  const handleSessionSubmit = async (data: CreateSessionInput) => {
+    try {
+      const { start_date, start_time, ...rest } = data; //exclude start date and time
+
+      const startDate = `${start_date.split("T")[0]}T${start_time}`;
+      let callId: string | null = null;
+      if (data.virtual) {
+        const call = await createVirtualMeeting({
+          description: data.description,
+          scheduled_start: startDate,
+        });
+        if (!call) {
+          throw new Error("Call not created.");
+        }
+        callId = call.id;
+      }
+
+      await addSession.mutateAsync({
+        ...rest,
+        lesson_id: lessonId || "",
+        call_id: callId,
+        scheduled_start: new Date(startDate).toISOString(),
+      });
+      closeSessionCreationModal();
+    } catch {}
+  };
 
   const improve = async (id: string) => {
     try {
@@ -105,7 +115,7 @@ export default function LessonPage({ lessonId }: { lessonId: string }) {
   if (isLoading) return <LoadingState />;
 
   return (
-    <div className="p-6 space-y-12">
+    <div className="container space-y-12">
       {sessionCreationModal}
       <div className="flex flex-col items-start md:flex-row gap-6 bg-background p-6 rounded-xl shadow-md justify-between md:items-center">
         <h1 className="text-2xl font-semibold">Lesson: {lesson?.topic}</h1>

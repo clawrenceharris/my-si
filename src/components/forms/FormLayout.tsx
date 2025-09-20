@@ -23,13 +23,14 @@ export interface FormLayoutProps<T extends FieldValues>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmit?: (data: T) => void | Promise<any>;
   onCancel?: () => void;
+  onSuccess?: () => void;
   isLoading?: boolean;
   error?: string | null;
   mode?: "onChange" | "onBlur" | "onSubmit" | "onTouched" | "all";
   isOpen?: boolean;
   description?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  resolver: Resolver<T, any, T>;
+  resolver?: Resolver<T, any, T>;
   descriptionStyle?: React.CSSProperties;
   defaultValues?: DefaultValues<T>;
   enableBeforeUnloadProtection?: boolean;
@@ -45,6 +46,7 @@ export function FormLayout<T extends FieldValues>({
   onSubmit,
   onCancel,
   resolver,
+  onSuccess,
   submitButtonClassName,
   isLoading = false,
   mode = "onSubmit",
@@ -77,6 +79,7 @@ export function FormLayout<T extends FieldValues>({
   const handleSubmit = async (data: T) => {
     try {
       await onSubmit?.(data);
+      onSuccess?.();
     } catch (error) {
       console.error(error);
       form.setError("root", { message: getUserErrorMessage(error) });
@@ -95,17 +98,21 @@ export function FormLayout<T extends FieldValues>({
         <div className="space-y-6">
           {/* General Error */}
           {form.formState.errors.root && (
-            <div className="p-3 text-sm text-red-600 bg-red-500/20 border border-red-500 rounded-md">
-              <FormMessage>{form.formState.errors.root.message} </FormMessage>
+            <div className="p-3 text-sm flex gap-5 justify-between items-center bg-red-500/20 rounded-md">
+              <FormMessage>{form.formState.errors.root.message}</FormMessage>
+              <Button type="submit" variant={"destructive"} size={"sm"}>
+                Retry
+              </Button>
             </div>
           )}
           {typeof children === "function" ? children(form) : children}
         </div>
 
-        <div className="justify-end flex items-center">
+        <div className="justify-end flex gap-2 items-center">
           {showsCancelButton && (
             <Button
-              variant={"ghost"}
+              size={"lg"}
+              variant={"link"}
               type="button"
               onClick={onCancel}
               disabled={isLoading}

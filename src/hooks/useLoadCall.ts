@@ -1,7 +1,7 @@
 import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
 import { useEffect, useState } from "react";
 
-export default function useLoadCall(id: string) {
+export default function useLoadCall(id?: string | null) {
   const client = useStreamVideoClient();
 
   const [call, setCall] = useState<Call>();

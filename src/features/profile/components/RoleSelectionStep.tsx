@@ -1,10 +1,10 @@
 import { GraduationCap, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { UserRole } from "@/types/user";
+import { Enums } from "@/types";
 
 interface RoleOption {
-  id: UserRole;
+  id: Enums<"user_role">;
   title: string;
   icon: React.ComponentType<{ className?: string }>;
 }
@@ -23,8 +23,8 @@ const roleOptions: RoleOption[] = [
 ];
 
 interface RoleSelectionStepProps {
-  selectedRole?: UserRole;
-  onRoleSelect: (role: UserRole) => void;
+  selectedRole?: Enums<"user_role">;
+  onRoleSelect: (role: Enums<"user_role">) => void;
   onNext: () => void;
   canProceed: boolean;
 }

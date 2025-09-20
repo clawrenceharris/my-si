@@ -10,18 +10,32 @@ import {
   Textarea,
 } from "@/components/ui";
 import { CreateSessionInput } from "@/features/sessions/domain";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 export function CreateSessionForm() {
   const {
     control,
-    setValue,
-    getValues,
+    watch,
+
     formState: { errors },
   } = useFormContext<CreateSessionInput>();
 
+  const watched = watch("virtual");
+  console.log(watched);
   return (
     <>
+      <FormField
+        name="course_name"
+        control={control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="sr-only">Course name</FormLabel>
+            <FormControl>
+              <Input placeholder="Course" {...field} />
+            </FormControl>
+          </FormItem>
+        )}
+      />
       <FormField
         name="topic"
         control={control}
@@ -58,7 +72,7 @@ export function CreateSessionForm() {
           control={control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Start Date</FormLabel>
+              <FormLabel>Start date</FormLabel>
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
@@ -72,7 +86,7 @@ export function CreateSessionForm() {
           control={control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Start Time</FormLabel>
+              <FormLabel>Start time</FormLabel>
               <FormControl>
                 <Input {...field} type="time" />
               </FormControl>
@@ -86,16 +100,19 @@ export function CreateSessionForm() {
         </FormMessage>
       )}
 
-      <FormItem className="flex gap-3">
-        <Label htmlFor="virtual">Virtual:</Label>
-        <FormControl>
+      <Label htmlFor="virtual">Virtual:</Label>
+      <Controller
+        name="virtual"
+        control={control}
+        render={({ field }) => (
           <Switch
+            checked={field.value}
+            onCheckedChange={field.onChange}
             id="virtual"
-            onToggle={() => setValue("virtual", !getValues("virtual"))}
-            defaultChecked={false}
           />
-        </FormControl>
-      </FormItem>
+        )}
+      />
+
       {errors.virtual && <FormMessage>{errors.virtual.message}</FormMessage>}
     </>
   );

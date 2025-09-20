@@ -1,7 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { ChatFormData, ChatInput } from "@/features/chat";
+import { ChatFormData } from "@/features/chat";
 import { useAsyncOperation } from "@/shared";
+import { ChatInput } from "@/components/features";
 
 export default function Dashboard() {
   const router = useRouter();

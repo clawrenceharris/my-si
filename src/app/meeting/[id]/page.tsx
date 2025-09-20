@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { Metadata } from "next";
+import MeetingPage from "../../session/virtual/[id]/MeetingPage";
 import MeetingLoginPage from "./MeetingLoginPage";
-import MeetingPage from "./MeetingPage";
 
 interface PageProps {
   params: { id: string };

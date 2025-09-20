@@ -5,6 +5,8 @@ import { openai } from "@/lib/openai/client";
 import { auth } from "@clerk/nextjs/server";
 
 import createClerkSupabaseClient from "@/lib/supabase/client";
+import {} from "@/types";
+import { LessonCards } from "@/types/tables";
 
 export async function POST(req: NextRequest) {
   const { topic, mode = "in_person" } = await req.json();
@@ -62,7 +64,7 @@ ${catalog
   const choice = JSON.parse(resp.choices[0].message?.content ?? "{}") as {
     topic: string;
     mode: string;
-    cards: { slug: string; phase: "warmup" | "workout" | "closer" }[];
+    cards: { slug: string; phase: LessonCards["phase"] }[];
   };
 
   // Create lesson

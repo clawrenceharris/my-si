@@ -1,22 +1,26 @@
 "use client";
 
-import AudioVolumeIndicator from "@/components/AudioVolumeIndicator";
-import Button, { buttonClassName } from "@/components/Button";
-import FlexibleCallLayout from "@/components/FlexibleCallLayout";
-import PermissionPrompt from "@/components/PermissionPrompt";
-import useLoadCall from "@/hooks/useLoadCall";
+import AudioVolumeIndicator from "@/components/features/video-calls/AudioVolumeIndicator";
+import { Button } from "@/components/ui";
+import FlexibleCallLayout from "@/components/features/video-calls/FlexibleCallLayout";
+import PermissionPrompt from "@/components/features/video-calls/PermissionPrompt";
+import { EmptyState, ErrorState, LoadingState } from "@/components/states";
+import { useSession, useSessions } from "@/features/sessions/hooks";
+import { useVirtualMeeting } from "@/features/sessions/hooks/useVirtualMeeting";
 import useStreamCall from "@/hooks/useStreamCall";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/providers";
 import {
+  Call,
   CallingState,
   DeviceSettings,
   StreamCall,
   StreamTheme,
   VideoPreview,
   useCallStateHooks,
+  useStreamVideoClient,
 } from "@stream-io/video-react-sdk";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface MeetingPageProps {
@@ -24,27 +28,67 @@ interface MeetingPageProps {
 }
 
 export default function MeetingPage({ id }: MeetingPageProps) {
-  const { user, isLoaded: userLoaded } = useUser();
+  const { user } = useUser();
+  const { session } = useSession(id);
+  const { updateSession } = useSessions(user.id);
+  const router = useRouter();
+  const { createVirtualMeeting } = useVirtualMeeting();
+  const client = useStreamVideoClient();
 
-  const { call, callLoading } = useLoadCall(id);
+  const [call, setCall] = useState<Call>();
+  const [callLoading, setCallLoading] = useState(true);
+  useEffect(() => {
+    async function loadCall() {
+      setCallLoading(true);
 
-  if (!userLoaded || callLoading) {
-    return <Loader2 className="mx-auto animate-spin" />;
+      if (!client) return;
+
+      const { calls } = await client.queryCalls({
+        filter_conditions: { id: session?.call_id },
+      });
+
+      if (calls.length > 0) {
+        const call = calls[0];
+
+        await call.get();
+
+        setCall(call);
+      }
+
+      setCallLoading(false);
+    }
+    loadCall();
+  }, [client, session?.call_id]);
+
+  if (callLoading) {
+    return <LoadingState />;
   }
 
-  if (!call) {
-    return <p className="text-center font-bold">Call not found</p>;
-  }
-
-  const notAllowedToJoin =
-    call.type === "private-meeting" &&
-    (!user || !call.state.members.find((m) => m.user.id === user.id));
-
-  if (notAllowedToJoin) {
+  if (!call && session) {
     return (
-      <p className="text-center font-bold">
-        You are not allowed to view this meeting
-      </p>
+      <EmptyState
+        variant="card"
+        title="Virtual Meeting not created."
+        actionLabel="Create Meeting"
+        onAction={async () => {
+          const call = await createVirtualMeeting(session);
+          await updateSession.mutateAsync({
+            id: session.id,
+            data: { call_id: call?.id },
+          });
+          router.refresh();
+        }}
+      />
+    );
+  }
+  if (!call) {
+    return (
+      <ErrorState
+        title="Session not found"
+        message="We could not find this session. Make sure you created it and set the mode to virtual."
+        retryLabel="Create Session"
+        onRetry={() => router.replace("/sessions")}
+      />
     );
   }
 
@@ -60,28 +104,11 @@ export default function MeetingPage({ id }: MeetingPageProps) {
 function MeetingScreen() {
   const call = useStreamCall();
 
-  const { useCallEndedAt, useCallStartsAt } = useCallStateHooks();
-
-  const callEndedAt = useCallEndedAt();
-  const callStartsAt = useCallStartsAt();
-
   const [setupComplete, setSetupComplete] = useState(false);
 
   async function handleSetupComplete() {
     call.join();
     setSetupComplete(true);
-  }
-
-  const callIsInFuture = callStartsAt && new Date(callStartsAt) > new Date();
-
-  const callHasEnded = !!callEndedAt;
-
-  if (callHasEnded) {
-    return <MeetingEndedScreen />;
-  }
-
-  if (callIsInFuture) {
-    return <UpcomingMeetingScreen />;
   }
 
   const description = call.state.custom.description;
@@ -161,39 +188,4 @@ function CallUI() {
   }
 
   return <FlexibleCallLayout />;
-}
-
-function UpcomingMeetingScreen() {
-  const call = useStreamCall();
-
-  return (
-    <div className="flex flex-col items-center gap-6">
-      <p>
-        This meeting has not started yet. It will start at{" "}
-        <span className="font-bold">
-          {call.state.startsAt?.toLocaleString()}
-        </span>
-      </p>
-      {call.state.custom.description && (
-        <p>
-          Description:{" "}
-          <span className="font-bold">{call.state.custom.description}</span>
-        </p>
-      )}
-      <Link href="/" className={buttonClassName}>
-        Go home
-      </Link>
-    </div>
-  );
-}
-
-function MeetingEndedScreen() {
-  return (
-    <div className="flex flex-col items-center gap-6">
-      <p className="font-bold">This meeting has ended</p>
-      <Link href="/" className={buttonClassName}>
-        Go home
-      </Link>
-    </div>
-  );
 }

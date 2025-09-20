@@ -1,10 +1,9 @@
 "use client";
 
+import { ErrorState } from "@/components/states";
+import { useRouter } from "next/navigation";
+
 export default function ErrorPage() {
-  return (
-    <div className="space-y-3 text-center">
-      <h1 className="text-2xl font-bold">Error</h1>
-      <p>Sorry, something went wrong. Please try again later.</p>
-    </div>
-  );
+  const router = useRouter();
+  return <ErrorState variant="card" onRetry={router.refresh} />;
 }

@@ -288,49 +288,49 @@ export type Database = {
       }
       sessions: {
         Row: {
-          actual_end: string | null
-          actual_start: string | null
+          call_id: string | null
           course_name: string | null
           created_at: string
           description: string | null
           id: string
           leader_id: string | null
           lesson_id: string | null
-          scheduled_start: string | null
+          scheduled_start: string
           session_code: string | null
           status: Database["public"]["Enums"]["session_status"]
           topic: string | null
           updated_at: string
+          virtual: boolean
         }
         Insert: {
-          actual_end?: string | null
-          actual_start?: string | null
+          call_id?: string | null
           course_name?: string | null
           created_at?: string
           description?: string | null
           id?: string
           leader_id?: string | null
           lesson_id?: string | null
-          scheduled_start?: string | null
+          scheduled_start?: string
           session_code?: string | null
           status?: Database["public"]["Enums"]["session_status"]
           topic?: string | null
           updated_at?: string
+          virtual?: boolean
         }
         Update: {
-          actual_end?: string | null
-          actual_start?: string | null
+          call_id?: string | null
           course_name?: string | null
           created_at?: string
           description?: string | null
           id?: string
           leader_id?: string | null
           lesson_id?: string | null
-          scheduled_start?: string | null
+          scheduled_start?: string
           session_code?: string | null
           status?: Database["public"]["Enums"]["session_status"]
           topic?: string | null
           updated_at?: string
+          virtual?: boolean
         }
         Relationships: [
           {
@@ -398,10 +398,6 @@ export type Database = {
         Args: { days_old?: number }
         Returns: number
       }
-      end_session: {
-        Args: { session_uuid: string }
-        Returns: boolean
-      }
       generate_session_code: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -462,22 +458,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
-      search_lessons: {
-        Args: {
-          limit_count?: number
-          search_term: string
-          session_uuid?: string
-        }
-        Returns: {
-          content: Json
-          created_at: string
-          generated_by: string
-          id: string
-          relevance_score: number
-          session_id: string
-          topic: string
-        }[]
-      }
       start_session: {
         Args: { session_uuid: string }
         Returns: boolean
@@ -486,7 +466,7 @@ export type Database = {
     Enums: {
       lesson_phase: "warmup" | "workout" | "closer"
       session_size: "1+" | "2+" | "4+" | "2-4" | "4-8" | "8+"
-      session_status: "scheduled" | "active" | "completed" | "cancelled"
+      session_status: "scheduled" | "active" | "completed" | "canceled"
       user_role: "si_leader" | "student" | "coordinator"
     }
     CompositeTypes: {
@@ -617,7 +597,7 @@ export const Constants = {
     Enums: {
       lesson_phase: ["warmup", "workout", "closer"],
       session_size: ["1+", "2+", "4+", "2-4", "4-8", "8+"],
-      session_status: ["scheduled", "active", "completed", "cancelled"],
+      session_status: ["scheduled", "active", "completed", "canceled"],
       user_role: ["si_leader", "student", "coordinator"],
     },
   },
