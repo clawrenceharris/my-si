@@ -1,28 +1,73 @@
-import { Modal, ModalProps } from "@/components/ui/Modal";
-import { cloneElement, useCallback, useRef, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+} from "@/components/ui";
+import React, { cloneElement, useCallback, useState } from "react";
 
-export const useModal = ({ onClose, children, ...props }: ModalProps) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export interface ModalProps {
+  onClose?: () => void;
+  children?: React.ReactElement<{ description?: string }>;
+  title: string;
+
+  hidesDescription?: boolean;
+  isOpen?: boolean;
+  description?: string;
+  submitText?: string;
+}
+export const useModal = ({
+  onClose,
+  description,
+  title,
+  hidesDescription,
+  children,
+}: ModalProps) => {
+  const [open, setOpen] = useState(false);
 
   const openModal = useCallback(() => {
-    setIsModalOpen(true);
+    setOpen(true);
   }, []);
   const closeModal = useCallback(() => {
-    setIsModalOpen(false);
+    setOpen(false);
     onClose?.();
   }, [onClose]);
-
+  const handleOpenChange = () => {
+    if (open) {
+      closeModal();
+    } else {
+      openModal();
+    }
+  };
   const ModalComponent = (
-    <Modal isOpen={isModalOpen} ref={modalRef} onClose={closeModal} {...props}>
-      {cloneElement(children, { description: props.description })}
-    </Modal>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{title}</DialogTitle>
+          </DialogHeader>
+
+          <DialogDescription className={`${hidesDescription ? "sr-only" : ""}`}>
+            {description}
+          </DialogDescription>
+          <div className="max-h-[70vh] overflow-auto">
+            {React.isValidElement(children)
+              ? cloneElement(children, { description })
+              : children}
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   );
 
   return {
     closeModal,
     openModal,
-    modal: isModalOpen ? ModalComponent : null,
-    isModalOpen,
+    modal: open ? ModalComponent : null,
+    isModalOpen: open,
   };
 };

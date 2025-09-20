@@ -12,9 +12,8 @@ export async function POST(req: NextRequest) {
   if (!sessionId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const clerkToken = await getToken({ template: "client" });
   const client = createClerkSupabaseClient({
-    clerkToken,
+    getTokenFn: getToken,
   });
 
   const { data: lesson, error: le } = await client

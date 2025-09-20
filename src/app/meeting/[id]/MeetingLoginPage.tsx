@@ -1,4 +1,4 @@
-import { Button } from "@/components";
+import { Button } from "@/components/ui";
 import { ClerkLoaded, ClerkLoading, SignInButton } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";

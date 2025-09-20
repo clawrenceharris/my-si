@@ -1,6 +1,15 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
+import { useRouter } from "next/navigation";
 
 /**
  * Available variants for error display
@@ -66,8 +75,8 @@ export interface ErrorStateProps {
  */
 export function ErrorState({
   variant = "default",
-  title = "Something went wrong",
-  message = "We encountered an error while loading this content. Please try again.",
+  title = "Something went wrong.",
+  message = "Sorry, something's not working here. Come back later and try again.",
   icon,
   onRetry,
   retryLabel = "Try Again",
@@ -75,6 +84,7 @@ export function ErrorState({
   className,
   showIcon = true,
 }: ErrorStateProps) {
+  const router = useRouter();
   const defaultIcon = (
     <svg
       className="w-12 h-12 text-destructive"
@@ -155,9 +165,7 @@ export function ErrorState({
           ))}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-destructive">{title}</p>
-          {message && (
-            <p className="text-xs text-muted-foreground mt-1">{message}</p>
-          )}
+          {message && <p className="text-xs text-white mt-1">{message}</p>}
         </div>
         {onRetry && (
           <Button
@@ -174,27 +182,25 @@ export function ErrorState({
   );
 
   const renderCard = () => (
-    <div
-      className={cn("error-state", "error-state-card", className)}
-      data-testid="error-state"
-    >
-      <div className="p-6 bg-card border border-border rounded-lg text-center">
-        {showIcon && (
-          <div className="flex justify-center mb-4">{icon || defaultIcon}</div>
-        )}
-        <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-        {message && (
-          <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-            {message}
-          </p>
-        )}
+    <Card className="space-y-3 m-auto top-[50%] left-[50%] translate-[-50%] absolute flex flex-col justify-center max-w-md text-center">
+      <CardHeader>
+        <CardTitle className="text-2xl">Something went wrong.</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <CardDescription>{message}</CardDescription>
+      </CardContent>
+
+      <CardFooter className="gap-4 justify-end">
         {onRetry && (
           <Button onClick={onRetry} variant="outline">
             {retryLabel}
           </Button>
         )}
-      </div>
-    </div>
+        <Button onClick={router.refresh} variant="primary">
+          Refresh
+        </Button>
+      </CardFooter>
+    </Card>
   );
 
   const renderDefault = () => (
@@ -204,15 +210,9 @@ export function ErrorState({
     >
       <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
         {showIcon && <div className="mb-4">{icon || defaultIcon}</div>}
-        <h3 className="text-xl font-semibold text-foreground mb-2">{title}</h3>
-        {message && (
-          <p className="text-muted-foreground mb-6 max-w-md">{message}</p>
-        )}
-        {onRetry && (
-          <Button onClick={onRetry} variant="default">
-            {retryLabel}
-          </Button>
-        )}
+        <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
+        {message && <p className="text-white mb-6 max-w-md">{message}</p>}
+        {onRetry && <Button onClick={onRetry}>{retryLabel}</Button>}
       </div>
     </div>
   );

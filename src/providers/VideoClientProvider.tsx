@@ -6,9 +6,9 @@ import {
   StreamVideoClient,
   User,
 } from "@stream-io/video-react-sdk";
-import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getToken } from "../app/actions";
+import { LoadingState } from "@/components/states";
 
 interface ClientProviderProps {
   children: React.ReactNode;
@@ -18,11 +18,7 @@ export function VideoClientProvider({ children }: ClientProviderProps) {
   const videoClient = useInitializeVideoClient();
 
   if (!videoClient) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="mx-auto animate-spin" />
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return <StreamVideo client={videoClient}>{children}</StreamVideo>;

@@ -1,5 +1,4 @@
-// src/repositories/LessonsRepository.ts
-import { LessonCardsUpdate, Lessons } from "@/types/tables";
+import { LessonCards, LessonCardsUpdate, Lessons } from "@/types/tables";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { BaseRepository } from "@/repositories/base.repository";
 export class LessonRepository extends BaseRepository<Lessons> {
@@ -40,7 +39,10 @@ export class LessonRepository extends BaseRepository<Lessons> {
     }
     return data;
   }
-  async updateLessonCard(cardId: string, updatedFields: LessonCardsUpdate) {
+  async updateLessonCard(
+    cardId: string,
+    updatedFields: LessonCardsUpdate
+  ): Promise<LessonCards> {
     const { data, error } = await this.client
       .from("lesson_cards")
       .update(updatedFields)
@@ -52,7 +54,7 @@ export class LessonRepository extends BaseRepository<Lessons> {
     return data;
   }
   async updateCardPositions(cards: { id: string; position: number }[]) {
-    const updates = [];
+    const updates: Promise<LessonCards>[] = [];
 
     for (const c of cards) {
       updates.push(this.updateLessonCard(c.id, { position: c.position }));

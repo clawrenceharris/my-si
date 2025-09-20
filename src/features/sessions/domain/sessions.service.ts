@@ -1,9 +1,9 @@
 // src/services/LessonsService.ts
 import { SupabaseClient } from "@supabase/supabase-js";
 import { SessionsRepository } from "../data";
-import { Sessions, SessionsInsert } from "@/types/tables";
+import { Sessions, SessionsInsert, SessionsUpdate } from "@/types/tables";
 
-export class SessionService {
+export class SessionsService {
   private repository: SessionsRepository;
 
   constructor(client: SupabaseClient) {
@@ -17,5 +17,16 @@ export class SessionService {
   }
   async deleteSession(id: string): Promise<void> {
     await this.repository.delete(id);
+  }
+  getAllByUser(userId: string): Promise<Sessions[]> {
+    return this.repository.getAllByUser(userId);
+  }
+
+  addSession(data: SessionsInsert) {
+    return this.repository.create(data);
+  }
+
+  updateSession(id: string, data: SessionsUpdate) {
+    return this.repository.update(id, data);
   }
 }

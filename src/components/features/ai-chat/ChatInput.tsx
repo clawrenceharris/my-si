@@ -15,7 +15,7 @@ import { ChatFormData, chatMessageSchema } from "@/features/chat";
 
 interface ChatInputProps {
   placeholder?: string;
-  onSubmit?: (data: ChatFormData) => Promise<void> | void;
+  onSubmit?: (data: ChatFormData) => Promise<void | null> | void;
   disabled?: boolean;
   isLoading?: boolean;
   loading?: boolean;
