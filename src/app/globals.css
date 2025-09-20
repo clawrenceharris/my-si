@@ -150,7 +150,7 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --input: #edeff1;
-  --border: #e5e7eb;
+  --border: #f2f5fa;
   --ring: #93c5fd;
 }
 
@@ -161,21 +161,30 @@
   body {
     @apply min-h-screen from-primary-300  to-primary-600 text-foreground;
   }
+  main {
+    @apply p-12 mt-[50px];
+  }
 }
 @layer components {
   .strategy-card {
     @apply relative transition-shadow duration-200 rounded-2xl shadow-md border-2 max-w-xl
       hover:shadow-lg bg-secondary-50;
   }
+  .container {
+    @apply p-6 max-w-7xl;
+  }
   .btn {
-    @apply inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap rounded-full text-[16px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0;
+    @apply inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0;
+  }
+  .btn-destructive {
+    @apply bg-destructive text-primary-foreground shadow-xs hover:bg-destructive/90;
   }
   .btn-primary {
-    @apply bg-primary-400 text-background hover:bg-primary-600;
+    @apply bg-primary-400 text-primary-foreground hover:bg-primary-600;
   }
 
   .btn-secondary {
-    @apply bg-secondary-500 text-secondary-foreground hover:bg-secondary-600;
+    @apply bg-secondary-500 text-primary-foreground hover:bg-secondary-600;
   }
   .btn-tertiary {
     @apply bg-primary-foreground text-foreground hover:bg-primary-foreground/50;

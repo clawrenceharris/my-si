@@ -1,4 +1,4 @@
-import { UserRole } from "@/types/user";
+import { Enums } from "@/types";
 
 // Onboarding step identifiers
 export enum OnboardingStep {
@@ -18,7 +18,7 @@ export interface OnboardingState {
 
 // Collected onboarding data
 export interface OnboardingData {
-  role?: UserRole;
+  role?: Enums<"user_role">;
   coursesInstructed?: string[];
   preferences?: Record<string, unknown>;
 }

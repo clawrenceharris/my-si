@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui";
+import { Button, Card, CardDescription, CardTitle } from "@/components/ui";
 
 /**
  * Available variants for empty state display
@@ -87,9 +87,7 @@ export function EmptyState({
     return (
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         {onAction && actionLabel && (
-          <Button onClick={onAction} variant="default">
-            {actionLabel}
-          </Button>
+          <Button onClick={onAction}>{actionLabel}</Button>
         )}
         {onSecondaryAction && secondaryActionLabel && (
           <Button onClick={onSecondaryAction} variant="outline">
@@ -151,21 +149,12 @@ export function EmptyState({
   );
 
   const renderCard = () => (
-    <div
-      className={cn("empty-state", "empty-state-card", className)}
-      data-testid="empty-state"
-    >
-      <div className="p-6 bg-card border border-border rounded-lg text-center">
-        {icon && <div className="flex justify-center mb-4">{icon}</div>}
-        <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-        {description && (
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            {description}
-          </p>
-        )}
-        {renderActions()}
-      </div>
-    </div>
+    <Card className="space-y-3 m-auto top-[50%] left-[50%] translate-[-50%] absolute flex flex-col justify-center max-w-md text-center">
+      {icon && <div className="flex justify-center mb-4">{icon}</div>}
+      <CardTitle className="text-xl">{title}</CardTitle>
+      {description && <CardDescription>{description}</CardDescription>}
+      {renderActions()}
+    </Card>
   );
 
   const renderDefault = () => (

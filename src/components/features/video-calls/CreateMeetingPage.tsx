@@ -1,6 +1,5 @@
 "use client";
 
-import Button from "@/components/Button";
 import { useUser } from "@clerk/nextjs";
 import {
   Call,
@@ -11,6 +10,7 @@ import { Copy, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { getUserIds } from "../../../app/actions";
+import { Button } from "@/components/ui";
 
 export default function CreateMeetingForm() {
   const [descriptionInput, setDescriptionInput] = useState("");

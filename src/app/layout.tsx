@@ -8,7 +8,12 @@ import {
   SignUpButton,
 } from "@clerk/nextjs";
 import "./globals.css";
-import { QueryProvider, SupabaseClientProvider } from "@/providers";
+import {
+  QueryProvider,
+  SupabaseClientProvider,
+  UserProvider,
+  VideoClientProvider,
+} from "@/providers";
 import { ReactNode } from "react";
 import {
   Button,
@@ -18,10 +23,8 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  SidebarProvider,
 } from "@/components/ui";
-import { VideoClientProvider } from "@/providers";
-import { Book, Clock, Hamburger, Link, Menu, Rocket } from "lucide-react";
+import { Book, Clock, Menu, Rocket } from "lucide-react";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -31,7 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <html lang="en">
         <body className="bg-gradient-to-br">
-          <header className="sticky top-0 flex justify-end items-center p-4 gap-4 h-16 z-99">
+          <header className="fixed top-0 flex justify-end items-center p-4 gap-4 h-16 z-99">
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
@@ -77,9 +80,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </header>
           <QueryProvider>
             <SupabaseClientProvider>
-              {/* <VideoClientProvider> */}
-              <main>{children}</main>
-              {/* </VideoClientProvider> */}
+              <UserProvider>
+                <VideoClientProvider>{children}</VideoClientProvider>
+              </UserProvider>
             </SupabaseClientProvider>
           </QueryProvider>
         </body>

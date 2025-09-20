@@ -4,3 +4,4 @@ export {
   SortableStrategyCard,
   CardGhost,
 } from "./lessons/SortableStrategyCard";
+export { SessionCard } from "./sessions/SessionCard";
