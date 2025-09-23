@@ -13,3 +13,7 @@ export * from "./sidebar";
 export * from "./navigation-menu";
 export * from "./switch";
 export * from "./tooltip";
+export * from "./checkbox";
+export * from "./sheet";
+export * from "./drawer";
+export * from "./avatar";
