@@ -1,25 +1,25 @@
-import { AppErrorCode, normalizeError } from "@/shared";
+import { normalizeError } from "@/utils/errorUtils";
 
 import { Profiles, ProfilesInsert, ProfilesUpdate } from "@/types/tables";
 import { ProfilesRepository } from "../data";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { AppErrorCode } from "@/types/errors";
 
 /**
  * Service layer for profile business logic
- * Handles validation, business rules, and error normalization
+ *
  */
 export class ProfileService {
-  private repository;
+  private repository: ProfilesRepository;
   constructor(client: SupabaseClient) {
     this.repository = new ProfilesRepository(client);
   }
 
   /**
-   * Create a new user profile with validation
+   * Create a new user profile
    */
   async createProfile(data: ProfilesInsert): Promise<Profiles> {
     try {
-      // Create profile
       return await this.repository.create(data);
     } catch (error) {
       throw normalizeError(error);
@@ -42,7 +42,7 @@ export class ProfileService {
   }
 
   /**
-   * Update user profile with validation
+   * Update user profile
    */
   async updateProfile(userId: string, data: ProfilesUpdate): Promise<Profiles> {
     try {
@@ -54,9 +54,6 @@ export class ProfileService {
     }
   }
 
-  /**
-   * Check if profile exists for user
-   */
   async profileExists(userId: string): Promise<boolean> {
     try {
       return await this.repository.existsById(userId);

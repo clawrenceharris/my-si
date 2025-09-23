@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useEffect, type ReactNode } from "react";
 import {
@@ -9,9 +10,9 @@ import {
   Resolver,
 } from "react-hook-form";
 import { Form, FormDescription, FormMessage } from "../ui/form";
-import { getUserErrorMessage } from "@/shared";
 import { Button } from "../ui";
 import { Loader2 } from "lucide-react";
+import { getUserErrorMessage } from "@/utils/errorUtils";
 
 export interface FormLayoutProps<T extends FieldValues>
   extends UseFormProps<T> {
@@ -20,7 +21,6 @@ export interface FormLayoutProps<T extends FieldValues>
   showsCancelButton?: boolean;
   submitText?: string;
   cancelText?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmit?: (data: T) => void | Promise<any>;
   onCancel?: () => void;
   onSuccess?: () => void;
@@ -29,7 +29,6 @@ export interface FormLayoutProps<T extends FieldValues>
   mode?: "onChange" | "onBlur" | "onSubmit" | "onTouched" | "all";
   isOpen?: boolean;
   description?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   resolver?: Resolver<T, any, T>;
   descriptionStyle?: React.CSSProperties;
   defaultValues?: DefaultValues<T>;

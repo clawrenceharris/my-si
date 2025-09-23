@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Error severity levels
 export enum ErrorSeverity {
   LOW = "low", // Non-critical, user can continue
@@ -63,7 +64,6 @@ export class AppError extends Error {
   public readonly severity: ErrorSeverity;
   public readonly userMessage: string;
   public readonly canRetry: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly metadata?: Record<string, any>;
   public readonly timestamp: Date;
 
@@ -74,7 +74,6 @@ export class AppError extends Error {
     userMessage: string,
     canRetry: boolean = false,
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     metadata?: Record<string, any>
   ) {
     super(userMessage);

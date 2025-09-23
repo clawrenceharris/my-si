@@ -48,7 +48,7 @@ export function SortableStrategyCard({
     attributes,
     listeners,
     setNodeRef,
-    setActivatorNodeRef, // <-- handle is the activator
+    setActivatorNodeRef,
     transform,
     transition,
     index,

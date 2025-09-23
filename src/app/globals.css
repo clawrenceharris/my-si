@@ -113,7 +113,7 @@
   --background: #fafafa;
 
   /* Foreground */
-  --foreground: #111827;
+  --foreground: #10131a;
   --primary-foreground: #fff;
   --secondary-foreground: #e0ebfb;
   --accent-foreground: #595959;
@@ -153,16 +153,31 @@
   --border: #f2f5fa;
   --ring: #93c5fd;
 }
+.str-video {
+  --str-video__primary-color: var(--color-primary-400);
+  --str-video__secondary-color: #90ee02;
+  --str-video__text-color1: #282b2b;
+  --str-video__border-radius-circle: 15px;
+}
 
+.str-video__participant-details {
+  color: white;
+}
+.str-video__menu-container {
+  color: white;
+}
+.str-video__notification {
+  color: white;
+}
 @layer base {
   * {
-    @apply relative border-border outline-ring/50;
+    @apply border-border outline-ring/50;
   }
   body {
-    @apply min-h-screen from-primary-300  to-primary-600 text-foreground;
+    @apply h-screen;
   }
   main {
-    @apply p-12 mt-[50px];
+    @apply text-foreground  h-full;
   }
 }
 @layer components {
@@ -171,7 +186,7 @@
       hover:shadow-lg bg-secondary-50;
   }
   .container {
-    @apply p-6 max-w-7xl;
+    @apply px-12 py-8 max-w-6xl;
   }
   .btn {
     @apply inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0;

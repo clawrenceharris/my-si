@@ -7,16 +7,13 @@ import { Button, Card, CardDescription, CardTitle } from "@/components/ui";
  */
 export type EmptyVariant = "default" | "minimal" | "card" | "inline";
 
-/**
- * Props for the EmptyState component
- */
 export interface EmptyStateProps {
   /** The display variant - affects layout and styling */
   variant?: EmptyVariant;
   /** The empty state title/heading */
   title?: string;
   /** Descriptive text explaining the empty state */
-  description?: string;
+  message?: string;
   /** Custom icon to display (overrides default) */
   icon?: React.ReactNode;
   /** Text for the primary action button */
@@ -43,7 +40,7 @@ export interface EmptyStateProps {
  * // Default empty state with action
  * <EmptyState
  *   title="No habitats found"
- *   description="Create your first habitat to get started"
+ *   message="Create your first habitat to get started"
  *   actionLabel="Create Habitat"
  *   onAction={handleCreate}
  * />
@@ -72,8 +69,8 @@ export interface EmptyStateProps {
  */
 export function EmptyState({
   variant = "default",
-  title = "No items found",
-  description = "There are no items to display at the moment.",
+  title = "Nothing here yet.",
+  message: message = "There are no items to display at the moment.",
   icon,
   actionLabel,
   onAction,
@@ -130,8 +127,8 @@ export function EmptyState({
         {icon && icon}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground">{title}</p>
-          {description && (
-            <p className="text-xs text-muted-foreground mt-1">{description}</p>
+          {message && (
+            <p className="text-xs text-muted-foreground mt-1">{message}</p>
           )}
         </div>
         {onAction && actionLabel && (
@@ -152,7 +149,7 @@ export function EmptyState({
     <Card className="space-y-3 m-auto top-[50%] left-[50%] translate-[-50%] absolute flex flex-col justify-center max-w-md text-center">
       {icon && <div className="flex justify-center mb-4">{icon}</div>}
       <CardTitle className="text-xl">{title}</CardTitle>
-      {description && <CardDescription>{description}</CardDescription>}
+      {message && <CardDescription>{message}</CardDescription>}
       {renderActions()}
     </Card>
   );
@@ -165,8 +162,8 @@ export function EmptyState({
       <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
         {icon && <div className="mb-4">{icon}</div>}
         <h3 className="text-xl font-semibold text-foreground mb-2">{title}</h3>
-        {description && (
-          <p className="text-muted-foreground mb-6 max-w-md">{description}</p>
+        {message && (
+          <p className="text-muted-foreground mb-6 max-w-md">{message}</p>
         )}
         {renderActions()}
       </div>

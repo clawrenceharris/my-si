@@ -1,7 +1,6 @@
+import { AppError, ErrorSeverity } from "@/types/errors";
+import { logError, normalizeError } from "@/utils/errorUtils";
 import { useState, useCallback } from "react";
-import { AppError, ErrorSeverity } from "../errors/types";
-import { normalizeError } from "../errors/normalize";
-import { logError } from "../errors/logger";
 
 // Central error handling hook
 export function useErrorHandler() {

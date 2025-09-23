@@ -8,8 +8,8 @@ import {
   createSessionSchema,
 } from "@/features/sessions/domain";
 import { useSessions } from "@/features/sessions/hooks";
+import { useModal } from "@/hooks";
 import { useUser } from "@/providers";
-import { useModal } from "@/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 

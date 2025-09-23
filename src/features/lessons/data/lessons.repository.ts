@@ -20,7 +20,7 @@ export class LessonRepository extends BaseRepository<Lessons> {
   async getLessonCards(lessonId: string) {
     const { error, data } = await this.client
       .from("lesson_cards")
-      .select("id,title,phase,steps,category,position")
+      .select("*")
       .eq("lesson_id", lessonId)
       .order("position");
     if (error) {

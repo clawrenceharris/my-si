@@ -17,7 +17,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui";
-import { useModal } from "@/shared";
 import { Sessions } from "@/types/tables";
 import { Link } from "lucide-react";
 import { CreateSessionForm } from "./CreateSessionForm";
@@ -29,6 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useSessions } from "@/features/sessions/hooks";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/providers";
+import { useModal } from "@/hooks";
 
 interface SessionCardProps {
   session: Sessions;
@@ -88,10 +88,11 @@ export function SessionCard({ session }: SessionCardProps) {
   });
   const handleStartSession = async () => {
     try {
-      await updateSession.mutateAsync({
-        id: session.id,
-        data: { status: "active" },
-      });
+      if (session.status !== "active")
+        await updateSession.mutateAsync({
+          id: session.id,
+          data: { status: "active" },
+        });
       if (session.virtual) {
         router.push(`/session/virtual/${session.id}`);
       }
@@ -113,6 +114,11 @@ export function SessionCard({ session }: SessionCardProps) {
     });
     sessionsQuery.refetch();
   };
+  const handleCopy = () => {
+    const link = `${window.location.origin}/session/virtual/${session.id}`;
+    navigator.clipboard.writeText(link);
+    alert("Link copied to clipboard!");
+  };
   const statusColor: Record<Sessions["status"], string> = {
     scheduled: "bg-primary-100 text-primary-500",
     active: "bg-success-100 text-success-500",
@@ -124,7 +130,7 @@ export function SessionCard({ session }: SessionCardProps) {
     <Card className="overflow-hidden flex justify-between flex-col max-w-md hover:shadow-md transition-shadow duration-200">
       {confirmationModal}
       {editSessionModal}
-      <CardHeader className="">
+      <CardHeader>
         <div className="flex justify-between items-center"></div>
         <div className="flex items-center justify-between">
           <CardTitle className="text-md font-semibold">
@@ -159,7 +165,7 @@ export function SessionCard({ session }: SessionCardProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {session.status === "scheduled" && (
+            {session.status !== "canceled" && session.status != "completed" && (
               <>
                 <DropdownMenuItem onClick={openEditSessionModal}>
                   Update
@@ -196,7 +202,7 @@ export function SessionCard({ session }: SessionCardProps) {
 
         <div className="flex gap-0.5 items-center">
           <Button
-            disabled={session.status !== "scheduled"}
+            disabled={session.status === "canceled"}
             className="rounded-tr-none rounded-br-none "
             onClick={handleStartSession}
           >
@@ -205,7 +211,8 @@ export function SessionCard({ session }: SessionCardProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                disabled={session.status !== "scheduled"}
+                onClick={handleCopy}
+                disabled={session.status === "canceled"}
                 className="rounded-tl-none rounded-bl-none"
               >
                 <Link />

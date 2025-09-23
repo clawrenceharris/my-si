@@ -5,3 +5,4 @@ export {
   CardGhost,
 } from "./lessons/SortableStrategyCard";
 export { SessionCard } from "./sessions/SessionCard";
+export { ActivityPanel } from "./sessions/ActivityPanel";

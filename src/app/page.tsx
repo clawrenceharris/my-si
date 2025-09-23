@@ -1,8 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { ChatFormData } from "@/features/chat";
-import { useAsyncOperation } from "@/shared";
 import { ChatInput } from "@/components/features";
+import { useAsyncOperation } from "@/hooks";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -22,8 +22,8 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="mx-auto max-w-xl p-6 space-y-4">
-      <section className="px-6">
+    <main className="mx-auto bg-gradient-to-br from-primary-300  to-primary-600">
+      <section className="container">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="mb-6 text-4xl font-bold leading-tight text-background">
@@ -36,12 +36,11 @@ export default function Dashboard() {
               <div className="bg-white rounded-xl p-8 shadow-lg">
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    AI Lesson Builder
+                    Plan your Lesson
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Describe your topic and I&apos;ll create a comprehensive
-                    lesson plan with activities, discussion questions, and
-                    assessments.
+                    Describe your topic and to compose a comprehensive lesson
+                    plan with engaging Playbooks.
                   </p>
                 </div>
 
@@ -78,6 +77,6 @@ export default function Dashboard() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

@@ -117,34 +117,40 @@ export type Database = {
           card_slug: string
           category: string
           created_at: string | null
+          description: string
           id: string
           lesson_id: string
           phase: Database["public"]["Enums"]["lesson_phase"]
           position: number
           steps: string[]
           title: string
+          virtualized: boolean | null
         }
         Insert: {
           card_slug?: string
           category: string
           created_at?: string | null
+          description?: string
           id?: string
           lesson_id: string
           phase: Database["public"]["Enums"]["lesson_phase"]
           position: number
           steps: string[]
           title: string
+          virtualized?: boolean | null
         }
         Update: {
           card_slug?: string
           category?: string
           created_at?: string | null
+          description?: string
           id?: string
           lesson_id?: string
           phase?: Database["public"]["Enums"]["lesson_phase"]
           position?: number
           steps?: string[]
           title?: string
+          virtualized?: boolean | null
         }
         Relationships: [
           {
@@ -193,6 +199,7 @@ export type Database = {
           id: string
           onboarding_completed: boolean | null
           role: Database["public"]["Enums"]["user_role"] | null
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
@@ -204,6 +211,7 @@ export type Database = {
           id?: string
           onboarding_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
@@ -215,6 +223,7 @@ export type Database = {
           id?: string
           onboarding_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -347,6 +356,7 @@ export type Database = {
           category: string | null
           course_tags: string[]
           created_at: string | null
+          description: string
           good_for: string[]
           id: string
           session_size: Database["public"]["Enums"]["session_size"]
@@ -354,11 +364,13 @@ export type Database = {
           steps: string[]
           title: string
           virtual_friendly: boolean
+          virtualized: boolean | null
         }
         Insert: {
           category?: string | null
           course_tags?: string[]
           created_at?: string | null
+          description?: string
           good_for?: string[]
           id?: string
           session_size?: Database["public"]["Enums"]["session_size"]
@@ -366,11 +378,13 @@ export type Database = {
           steps: string[]
           title: string
           virtual_friendly?: boolean
+          virtualized?: boolean | null
         }
         Update: {
           category?: string | null
           course_tags?: string[]
           created_at?: string | null
+          description?: string
           good_for?: string[]
           id?: string
           session_size?: Database["public"]["Enums"]["session_size"]
@@ -378,6 +392,7 @@ export type Database = {
           steps?: string[]
           title?: string
           virtual_friendly?: boolean
+          virtualized?: boolean | null
         }
         Relationships: []
       }

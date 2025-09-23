@@ -4,7 +4,7 @@ import { useSupabaseClient } from "@/providers/SupabaseClientProvider";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LessonService } from "../domain/lessons.service";
 
-export function useLesson(lessonId: string) {
+export function useLesson(lessonId: string | null | undefined) {
   const client = useSupabaseClient();
   const service = new LessonService(client);
   const queryClient = useQueryClient();
@@ -12,7 +12,9 @@ export function useLesson(lessonId: string) {
   // Fetch lesson + cards
   const lessonQuery = useQuery({
     queryKey: ["lesson", lessonId],
-    queryFn: () => service.getLessonWithCards(lessonId),
+    queryFn: () => {
+      if (lessonId) return service.getLessonWithCards(lessonId);
+    },
     enabled: !!lessonId,
   });
 

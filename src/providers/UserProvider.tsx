@@ -3,11 +3,11 @@ import React from "react";
 import { createContext, useContext } from "react";
 
 import { ErrorState, LoadingState } from "@/components/states";
-import { useProfile } from "@/shared";
 import { UserResource } from "@clerk/types";
 import { useUser as useClerkUser } from "@clerk/nextjs";
 import { Profiles } from "@/types/tables";
 import { useRouter } from "next/navigation";
+import { useProfile } from "@/hooks";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const { user, isLoaded: loadedUser } = useClerkUser();
@@ -21,7 +21,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       <ErrorState
         title="Not signed in."
         message="Please log in to see this page."
-        onRetry={() => router.replace("/auth/login")}
+        retryLabel="Sign in"
+        onRetry={() => router.replace("auth/login")}
       />
     );
   }

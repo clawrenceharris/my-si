@@ -1,0 +1,214 @@
+import { Button, Textarea } from "@/components/ui";
+import { PlaybookContext, PlaybookDefinition } from "@/types/playbook";
+import { useState } from "react";
+
+function SnowballCard({
+  question,
+  onClick,
+}: {
+  question: string;
+  onClick: () => void;
+}) {
+  const [shown, setShown] = useState(false);
+  return (
+    <Button
+      onClick={() => {
+        setShown(true);
+        onClick();
+      }}
+      className="px-12 py-4 min-h-8 w-full flex items-center justify-center bg-muted-foreground rounded-xl"
+    >
+      {shown ? question : ""}
+    </Button>
+  );
+}
+
+// -----------------------------
+// Participant UI
+// -----------------------------
+function SnowballUI({ ctx }: { ctx: PlaybookContext }) {
+  const phase = ctx.state.phase || "write";
+  const pool = ctx.state.pool || {};
+  const chosen = ctx.state.chosen || {};
+  const originalPool = ctx.state.originalPool || {};
+  const [myQuestion, setMyQuestion] = useState("");
+
+  if (phase === "write") {
+    return (
+      <div className="space-y-3">
+        <p className="font-medium">Write a question</p>
+        <Textarea
+          value={myQuestion}
+          onChange={(e) => setMyQuestion(e.target.value)}
+          className="w-full border rounded p-2"
+        />
+        <Button
+          onClick={() => {
+            if (!myQuestion) return;
+            ctx.call.sendCustomEvent({
+              type: "snowball:submit",
+              userId: ctx.userId,
+              question: myQuestion,
+            });
+            setMyQuestion("");
+          }}
+        >
+          Submit
+        </Button>
+      </div>
+    );
+  }
+
+  if (phase === "pick") {
+    const myChoiceId = chosen?.[ctx.userId];
+
+    // If this user has already picked, show their chosen one
+    if (myChoiceId) {
+      return (
+        <div className="space-y-3">
+          <p className="font-medium">You picked this question:</p>
+          <div className="p-3 rounded bg-muted">{originalPool[myChoiceId]}</div>
+          <p className="italic">Take a moment to answer it.</p>
+        </div>
+      );
+    }
+
+    // Otherwise, show the pool to pick from
+    return (
+      <div className="space-y-3">
+        <p className="font-medium">Pick a question to answer:</p>
+        <ul className="space-y-2">
+          {Object.entries(pool).map(([qid, q]) => (
+            <li key={qid}>
+              <SnowballCard
+                question={String(q)}
+                onClick={() => {
+                  ctx.call.sendCustomEvent({
+                    type: "snowball:pick",
+                    userId: ctx.userId,
+                    questionId: qid,
+                  });
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  if (phase === "discuss") {
+    const myChoiceId = chosen?.[ctx.userId];
+    return (
+      <div className="space-y-3">
+        <p className="font-medium">Discussion Phase</p>
+        {myChoiceId ? (
+          <div>
+            <p className="italic">You’re answering:</p>
+            <div className="p-3 rounded bg-muted">
+              {originalPool[myChoiceId]}
+            </div>
+          </div>
+        ) : (
+          <p className="italic">Take turns discussing chosen questions!</p>
+        )}
+      </div>
+    );
+  }
+
+  return null;
+}
+
+// -----------------------------
+// Host Controls
+// -----------------------------
+function SnowballHostControls({ ctx }: { ctx: PlaybookContext }) {
+  const phase = ctx.state.phase || "write";
+
+  if (phase === "write") {
+    return (
+      <Button
+        variant="secondary"
+        onClick={() => {
+          ctx.call.sendCustomEvent({
+            type: "snowball:assign",
+            questions: ctx.state.pool,
+          });
+        }}
+      >
+        Publish Questions
+      </Button>
+    );
+  }
+
+  if (phase === "pick") {
+    return (
+      <Button
+        onClick={() => {
+          ctx.call.sendCustomEvent({ type: "snowball:discuss" });
+        }}
+      >
+        Start Discussion
+      </Button>
+    );
+  }
+
+  return null;
+}
+
+// -----------------------------
+// Definition
+// -----------------------------
+export const SnowballActivity: PlaybookDefinition = {
+  slug: "snowball",
+  title: "Snowball",
+  phases: ["write", "pick", "discuss"],
+
+  handleEvent(e, ctx) {
+    switch (e.custom.type) {
+      case "snowball:submit": {
+        const qid = `${e.custom.userId}-${Date.now()}`;
+        const newPool = { ...ctx.state.pool, [qid]: e.custom.question };
+        ctx.setState({
+          ...ctx.state,
+          pool: newPool,
+          originalPool: { ...ctx.state.originalPool, [qid]: e.custom.question },
+        });
+        break;
+      }
+
+      case "snowball:assign": {
+        ctx.setState({
+          ...ctx.state,
+          phase: "pick",
+          pool: e.custom.questions,
+          originalPool: { ...ctx.state.originalPool, ...e.custom.questions },
+          chosen: {},
+        });
+        break;
+      }
+
+      case "snowball:pick": {
+        const { userId, questionId } = e.custom;
+        const newPool = { ...ctx.state.pool };
+        delete newPool[questionId];
+        const newChosen = { ...(ctx.state.chosen || {}), [userId]: questionId };
+
+        ctx.setState({
+          ...ctx.state,
+          pool: newPool,
+          chosen: newChosen,
+        });
+        break;
+      }
+
+      case "snowball:discuss": {
+        ctx.setState({ ...ctx.state, phase: "discuss" });
+        break;
+      }
+    }
+  },
+
+  Component: SnowballUI,
+  HostControls: SnowballHostControls,
+};

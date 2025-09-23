@@ -10,7 +10,6 @@ export function useProfile(userId?: string) {
   const supabaseClient = useSupabaseClient();
   const profileService = new ProfileService(supabaseClient);
 
-  // Query for getting user profile
   const profileQuery = useQuery({
     queryKey: ["profile", userId],
     queryFn: async () => {
@@ -21,7 +20,6 @@ export function useProfile(userId?: string) {
     enabled: !!userId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error) => {
-      // Don't retry if profile not found
       if (error.message.toLowerCase().includes("not found")) {
         return false;
       }
@@ -30,7 +28,6 @@ export function useProfile(userId?: string) {
   });
 
   return {
-    // Query state
     profile: profileQuery.data,
     loading: profileQuery.isLoading,
     isError: profileQuery.isError,

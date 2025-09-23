@@ -17,8 +17,6 @@ import {
 import { LoadingState } from "@/components/states";
 import { useLesson } from "@/features/lessons/hooks/useLesson";
 
-import { useModal } from "@/shared";
-
 import { useEffect, useState } from "react";
 import {
   restrictToFirstScrollableAncestor,
@@ -36,6 +34,7 @@ import { useUser } from "@/providers";
 import { CreateSessionInput } from "@/features/sessions/domain";
 import { useVirtualMeeting } from "@/features/sessions/hooks/useVirtualMeeting";
 import { FormLayout } from "@/components/forms";
+import { useModal } from "@/hooks";
 
 export default function LessonPage({ lessonId }: { lessonId: string }) {
   const [cards, setCards] = useState<LessonCards[]>([]);
@@ -80,7 +79,7 @@ export default function LessonPage({ lessonId }: { lessonId: string }) {
       let callId: string | null = null;
       if (data.virtual) {
         const call = await createVirtualMeeting({
-          description: data.description,
+          ...data,
           scheduled_start: startDate,
         });
         if (!call) {
