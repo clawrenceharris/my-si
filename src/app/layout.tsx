@@ -1,4 +1,8 @@
 "use client";
+
+import "./globals.css";
+import "@stream-io/video-react-sdk/dist/css/styles.css";
+
 import {
   ClerkProvider,
   SignedIn,
@@ -7,11 +11,10 @@ import {
   SignOutButton,
   SignUpButton,
 } from "@clerk/nextjs";
-import "./globals.css";
+
 import {
   QueryProvider,
   SupabaseClientProvider,
-  UserProvider,
   VideoClientProvider,
 } from "@/providers";
 import { ReactNode } from "react";
@@ -33,37 +36,46 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       signUpFallbackRedirectUrl="/dashboard"
     >
       <html lang="en">
-        <body className="bg-gradient-to-br">
-          <header className="fixed top-0 flex justify-end items-center p-4 gap-4 h-16 z-99">
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>
-                    <Menu />
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <NavigationMenuLink href="/">
-                      <span className="inline-flex items-center gap-3">
-                        <Rocket className="inline" />
-                        Home
-                      </span>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink href="/sessions">
-                      <span className="inline-flex items-center gap-3">
-                        <Clock className="inline" />
-                        Sessions
-                      </span>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink href="/library">
-                      <span className="inline-flex items-center gap-3">
-                        <Book className="inline" />
-                        Library
-                      </span>
-                    </NavigationMenuLink>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+        <body>
+          <header className="fixed top-0 p-6 justify-end flex w-full z-99">
+            <nav className="flex p-2  rounded-full backdrop-blur-lg bg-background/30 gap-4 justify-end items-center">
+              <SignedIn>
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="rounded-full shadow-sm shadow-foreground/20">
+                        <Menu />
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <NavigationMenuLink href="/">
+                          <span className="inline-flex items-center gap-3">
+                            <Rocket className="inline" />
+                            Home
+                          </span>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink href="/sessions">
+                          <span className="inline-flex items-center gap-3">
+                            <Clock className="inline" />
+                            Sessions
+                          </span>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink href="/playbooks">
+                          <span className="inline-flex items-center gap-3">
+                            <Book className="inline" />
+                            Playbooks
+                          </span>
+                        </NavigationMenuLink>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+              </SignedIn>
+              <SignedIn>
+                <SignOutButton>
+                  <Button variant={"tertiary"}>Sign Out</Button>
+                </SignOutButton>
+              </SignedIn>
+            </nav>
             <SignedOut>
               <SignInButton>
                 <Button variant={"tertiary"}>Sign In</Button>
@@ -72,17 +84,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <Button>Sign Up</Button>
               </SignUpButton>
             </SignedOut>
-            <SignedIn>
-              <SignOutButton>
-                <Button variant={"tertiary"}>Sign Out</Button>
-              </SignOutButton>
-            </SignedIn>
           </header>
           <QueryProvider>
             <SupabaseClientProvider>
-              <UserProvider>
-                <VideoClientProvider>{children}</VideoClientProvider>
-              </UserProvider>
+              <VideoClientProvider>{children}</VideoClientProvider>
             </SupabaseClientProvider>
           </QueryProvider>
         </body>

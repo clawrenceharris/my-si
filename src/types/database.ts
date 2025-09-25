@@ -44,7 +44,7 @@ export type Database = {
             foreignKeyName: "activity_flows_card_slug_fkey"
             columns: ["card_slug"]
             isOneToOne: false
-            referencedRelation: "strategy_cards"
+            referencedRelation: "strategies"
             referencedColumns: ["slug"]
           },
         ]
@@ -117,34 +117,40 @@ export type Database = {
           card_slug: string
           category: string
           created_at: string | null
+          description: string
           id: string
           lesson_id: string
           phase: Database["public"]["Enums"]["lesson_phase"]
           position: number
           steps: string[]
           title: string
+          virtualized: boolean | null
         }
         Insert: {
           card_slug?: string
           category: string
           created_at?: string | null
+          description?: string
           id?: string
           lesson_id: string
           phase: Database["public"]["Enums"]["lesson_phase"]
           position: number
           steps: string[]
           title: string
+          virtualized?: boolean | null
         }
         Update: {
           card_slug?: string
           category?: string
           created_at?: string | null
+          description?: string
           id?: string
           lesson_id?: string
           phase?: Database["public"]["Enums"]["lesson_phase"]
           position?: number
           steps?: string[]
           title?: string
+          virtualized?: boolean | null
         }
         Relationships: [
           {
@@ -158,28 +164,31 @@ export type Database = {
       }
       lessons: {
         Row: {
+          course_name: string | null
           created_at: string | null
           id: string
-          mode: string
           topic: string
           updated_at: string | null
           user_id: string | null
+          virtual: boolean | null
         }
         Insert: {
+          course_name?: string | null
           created_at?: string | null
           id?: string
-          mode?: string
           topic: string
           updated_at?: string | null
           user_id?: string | null
+          virtual?: boolean | null
         }
         Update: {
+          course_name?: string | null
           created_at?: string | null
           id?: string
-          mode?: string
           topic?: string
           updated_at?: string | null
           user_id?: string | null
+          virtual?: boolean | null
         }
         Relationships: []
       }
@@ -193,6 +202,7 @@ export type Database = {
           id: string
           onboarding_completed: boolean | null
           role: Database["public"]["Enums"]["user_role"] | null
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
@@ -204,6 +214,7 @@ export type Database = {
           id?: string
           onboarding_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
@@ -215,6 +226,7 @@ export type Database = {
           id?: string
           onboarding_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -342,11 +354,12 @@ export type Database = {
           },
         ]
       }
-      strategy_cards: {
+      strategies: {
         Row: {
           category: string | null
           course_tags: string[]
           created_at: string | null
+          description: string
           good_for: string[]
           id: string
           session_size: Database["public"]["Enums"]["session_size"]
@@ -354,11 +367,13 @@ export type Database = {
           steps: string[]
           title: string
           virtual_friendly: boolean
+          virtualized: boolean | null
         }
         Insert: {
           category?: string | null
           course_tags?: string[]
           created_at?: string | null
+          description?: string
           good_for?: string[]
           id?: string
           session_size?: Database["public"]["Enums"]["session_size"]
@@ -366,11 +381,13 @@ export type Database = {
           steps: string[]
           title: string
           virtual_friendly?: boolean
+          virtualized?: boolean | null
         }
         Update: {
           category?: string | null
           course_tags?: string[]
           created_at?: string | null
+          description?: string
           good_for?: string[]
           id?: string
           session_size?: Database["public"]["Enums"]["session_size"]
@@ -378,6 +395,58 @@ export type Database = {
           steps?: string[]
           title?: string
           virtual_friendly?: boolean
+          virtualized?: boolean | null
+        }
+        Relationships: []
+      }
+      strategy_contexts: {
+        Row: {
+          context: string
+          id: string
+          strategy_slug: string
+        }
+        Insert: {
+          context: string
+          id?: string
+          strategy_slug: string
+        }
+        Update: {
+          context?: string
+          id?: string
+          strategy_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strategy_contexts_context_fkey"
+            columns: ["context"]
+            isOneToOne: false
+            referencedRelation: "student_contexts"
+            referencedColumns: ["context"]
+          },
+          {
+            foreignKeyName: "strategy_contexts_strategy_slug_fkey"
+            columns: ["strategy_slug"]
+            isOneToOne: false
+            referencedRelation: "strategies"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      student_contexts: {
+        Row: {
+          context: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          context: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          context?: string
+          created_at?: string
+          id?: string
         }
         Relationships: []
       }
@@ -449,6 +518,17 @@ export type Database = {
       get_session_summary: {
         Args: { session_uuid: string }
         Returns: Json
+      }
+      get_strategies_by_contexts: {
+        Args: { contexts: string[] }
+        Returns: {
+          category: string
+          good_for: string[]
+          session_size: Database["public"]["Enums"]["session_size"]
+          slug: string
+          title: string
+          virtual_friendly: boolean
+        }[]
       }
       refresh_session_dashboard_stats: {
         Args: Record<PropertyKey, never>

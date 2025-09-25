@@ -37,7 +37,15 @@ export type Sessions = Database["public"]["Tables"]["sessions"]["Row"];
 export type SessionsInsert = Database["public"]["Tables"]["sessions"]["Insert"];
 export type SessionsUpdate = Database["public"]["Tables"]["sessions"]["Update"];
 
-export type StrategyCards = Database["public"]["Tables"]["strategy_cards"]["Row"];
-export type StrategyCardsInsert = Database["public"]["Tables"]["strategy_cards"]["Insert"];
-export type StrategyCardsUpdate = Database["public"]["Tables"]["strategy_cards"]["Update"];
+export type Strategies = Database["public"]["Tables"]["strategies"]["Row"];
+export type StrategiesInsert = Database["public"]["Tables"]["strategies"]["Insert"];
+export type StrategiesUpdate = Database["public"]["Tables"]["strategies"]["Update"];
+
+export type StrategyContexts = Database["public"]["Tables"]["strategy_contexts"]["Row"];
+export type StrategyContextsInsert = Database["public"]["Tables"]["strategy_contexts"]["Insert"];
+export type StrategyContextsUpdate = Database["public"]["Tables"]["strategy_contexts"]["Update"];
+
+export type StudentContexts = Database["public"]["Tables"]["student_contexts"]["Row"];
+export type StudentContextsInsert = Database["public"]["Tables"]["student_contexts"]["Insert"];
+export type StudentContextsUpdate = Database["public"]["Tables"]["student_contexts"]["Update"];
 

@@ -5,11 +5,11 @@ export default function useLoadCall(id?: string | null) {
   const client = useStreamVideoClient();
 
   const [call, setCall] = useState<Call>();
-  const [callLoading, setCallLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadCall() {
-      setCallLoading(true);
+      setIsLoading(true);
 
       if (!client) return;
 
@@ -25,10 +25,10 @@ export default function useLoadCall(id?: string | null) {
         setCall(call);
       }
 
-      setCallLoading(false);
+      setIsLoading(false);
     }
     loadCall();
   }, [client, id]);
 
-  return { call, callLoading };
+  return { call, isLoading };
 }
