@@ -1,15 +1,15 @@
 "use client";
 
 import { CreateSessionForm, SessionCard } from "@/components/features";
-import { FormLayout } from "@/components/forms";
+import { FormLayout } from "@/components/layouts";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 import {
   CreateSessionInput,
   createSessionSchema,
 } from "@/features/sessions/domain";
 import { useSessions } from "@/features/sessions/hooks";
+import { useModal } from "@/hooks";
 import { useUser } from "@/providers";
-import { useModal } from "@/shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 
@@ -65,11 +65,14 @@ export default function SessionsPage() {
 
   return (
     <main>
-      {createSessionModal}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-        {sessions?.map((session) => (
-          <SessionCard key={session.id} session={session} />
-        ))}
+      <div className="container">
+        <h1 className="text-white">My Sessions</h1>
+        {createSessionModal}
+        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+          {sessions?.map((session) => (
+            <SessionCard key={session.id} session={session} />
+          ))}
+        </div>
       </div>
     </main>
   );

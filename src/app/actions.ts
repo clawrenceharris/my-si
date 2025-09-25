@@ -25,9 +25,11 @@ export async function getToken() {
 
   const issuedAt = Math.floor(Date.now() / 1000) - 60;
 
-  const token = streamClient.createToken(user.id, expirationTime, issuedAt);
-
-  console.log("Successfully generated token: ", token);
+  const token = streamClient.generateUserToken({
+    user_id: user.id,
+    exp: expirationTime,
+    iat: issuedAt,
+  });
 
   return token;
 }

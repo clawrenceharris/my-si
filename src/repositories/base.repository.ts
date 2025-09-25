@@ -18,7 +18,7 @@ export abstract class BaseRepository<TDomain> {
     return data;
   }
 
-  async getBy(column: string, value: string): Promise<TDomain | null> {
+  async getSingleBy(column: string, value: string): Promise<TDomain | null> {
     const { data, error } = await this.client
       .from(this.tableName)
       .select("*")
@@ -52,10 +52,10 @@ export abstract class BaseRepository<TDomain> {
     }
   }
 
-  async create<T>(data: Partial<T>): Promise<TDomain> {
+  async create<T>(data: T): Promise<TDomain> {
     const { data: result, error } = await this.client
       .from(this.tableName)
-      .insert(data)
+      .insert<T>(data)
       .select()
       .single();
 
@@ -66,7 +66,7 @@ export abstract class BaseRepository<TDomain> {
   async update<T>(id: string, updatedFields: T): Promise<TDomain> {
     const { data, error } = await this.client
       .from(this.tableName)
-      .update(updatedFields)
+      .update<T>(updatedFields)
       .eq("id", id)
       .select()
       .single();
@@ -82,5 +82,22 @@ export abstract class BaseRepository<TDomain> {
       .eq("id", id);
 
     if (error) throw error;
+  }
+  async getAllBy(column: string, value: string): Promise<TDomain[]> {
+    const { data, error } = await this.client
+      .from(this.tableName)
+      .select()
+      .eq(column, value);
+    if (error) {
+      throw error;
+    }
+    return data || [];
+  }
+  async getAll(): Promise<TDomain[]> {
+    const { data, error } = await this.client.from(this.tableName).select();
+    if (error) {
+      throw error;
+    }
+    return data || [];
   }
 }

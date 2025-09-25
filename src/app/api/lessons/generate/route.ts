@@ -1,15 +1,14 @@
 export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "crypto";
 import { openai } from "@/lib/openai/client";
 import { auth } from "@clerk/nextjs/server";
 
-import createClerkSupabaseClient from "@/lib/supabase/client";
 import {} from "@/types";
-import { LessonCards } from "@/types/tables";
+import { LessonCards, LessonsInsert, Strategies } from "@/types/tables";
+import createClerkSupabaseClient from "@/lib/supabase/client";
 
 export async function POST(req: NextRequest) {
-  const { topic, mode = "in_person" } = await req.json();
+  const { topic, course_name, contexts, virtual = false } = await req.json();
   const { sessionId, getToken, userId } = await auth();
   if (!sessionId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -18,36 +17,55 @@ export async function POST(req: NextRequest) {
   const client = createClerkSupabaseClient({
     getTokenFn: () => getToken(),
   });
+  const { data: strategies, error: se } = await client.rpc(
+    "get_strategies_by_contexts",
+    {
+      contexts,
+    }
+  );
 
-  // Pull data for prompting
-  const { data: cards, error } = await client
-    .from("strategy_cards")
-    .select("slug,title,category,good_for");
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (se) return NextResponse.json({ error: se.message }, { status: 500 });
 
-  // Build a small, prompt-safe catalog
-  const catalog = cards.map((c) => ({
+  // Builds a small, prompt-safe catalog
+
+  if (strategies.length < 3) {
+    return NextResponse.json(
+      {
+        error:
+          "Playbooks need at least 3 strategies but your filters returned less than that",
+      },
+      { status: 404 }
+    );
+  }
+
+  const catalog = strategies.map((c: Strategies) => ({
     slug: c.slug,
     title: c.title,
     category: c.category,
     good_for: c.good_for ?? [],
-  }));
+    session_size: c.session_size ?? null,
+  })) as Strategies[];
+  // Prompt for GPT
+  const sys = `You are an Supplement Instruction lesson planner for college students.
+Use ONLY the provided catalog of official strategies by slug.
+Choose exactly 3 SI strategies: one warmup, one workout (main activity), one closer.
+Selection rules:
+- Prefer strategies whose "good_for" tags work together to create a cohesive, well rounded lesson, with a beginning middle and end.
+Return STRICT JSON with no commentary:
+{
+  "cards": [
+    { "slug": string, "phase": "warmup"|"workout"|"closer" }
+  ]
+}`;
 
-  // Asks AI to choose exactly 3 cards and assign lesson roles
-  const sys = `You are an SI lesson planner.
-Use only the provided catalog of official strategy cards by slug.
-Pick exactly 3 cards: one warmup, one workout (main activity), one closer.
-Prefer cards whose "good_for" includes the requested mode.
-Return STRICT JSON: { "topic": string, "mode": "in_person"|"virtual",
-"cards":[ { "slug": string, "phase": "warmup"|"workout"|"closer" } ] }`;
-
-  const usr = `Topic: ${topic}
-Mode: ${mode}
-Catalog (slug | title | category | good_for):
+  const usr = `Topic: ${topic} Course: ${course_name}
+Catalog (slug | title | category | good_for | session_size):
 ${catalog
   .map(
-    (c) => `${c.slug} | ${c.title} | ${c.category} | ${c.good_for.join(",")}`
+    (c) =>
+      `${c.slug} | ${c.title} | ${c.category} | [${c.good_for.join(
+        ", "
+      )}] | size:${c.session_size}`
   )
   .join("\n")}
 `;
@@ -62,28 +80,26 @@ ${catalog
   });
 
   const choice = JSON.parse(resp.choices[0].message?.content ?? "{}") as {
-    topic: string;
-    mode: string;
     cards: { slug: string; phase: LessonCards["phase"] }[];
   };
 
-  // Create lesson
-  const { data: lesson, error: le } = await client
+  // Create the playbook
+  const { data: playbook, error: le } = await client
     .from("lessons")
-    .insert({
-      id: randomUUID(),
+    .insert<LessonsInsert>({
       user_id: userId,
-      topic: choice.topic || topic,
-      mode,
+      topic,
+      course_name,
+      virtual,
     })
     .select()
     .single();
   if (le) return NextResponse.json({ error: le.message }, { status: 500 });
 
-  // Rehydrate selected cards from DB, copy steps into lesson_cards with editable copies
+  // Rehydrates selected cards from database and copy steps into lesson_cards with editable copies
   const slugs = choice.cards.map((c) => c.slug);
   const { data: fullCards, error: ce } = await client
-    .from("strategy_cards")
+    .from("strategies")
     .select("slug,title,category,steps")
     .in("slug", slugs);
   if (ce) return NextResponse.json({ error: ce.message }, { status: 500 });
@@ -93,19 +109,18 @@ ${catalog
   const rows = choice.cards.map((sel) => {
     const c = fullCards.find((fc) => fc.slug === sel.slug)!;
     return {
-      id: randomUUID(),
-      lesson_id: lesson.id,
+      lesson_id: playbook.id,
       card_slug: c.slug,
       title: c.title,
       category: c.category,
       steps: c.steps,
       phase: sel.phase,
       position: orderMap[sel.phase],
-    };
+    } as LessonCards;
   });
 
   const { error: li } = await client.from("lesson_cards").insert(rows);
   if (li) return NextResponse.json({ error: li.message }, { status: 500 });
 
-  return NextResponse.json({ lessonId: lesson.id }, { status: 200 });
+  return NextResponse.json({ playbookId: playbook.id }, { status: 200 });
 }

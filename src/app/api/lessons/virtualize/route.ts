@@ -6,7 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 import createClerkSupabaseClient from "@/lib/supabase/client";
 
 export async function POST(req: NextRequest) {
-  const { lessonId } = await req.json();
+  const { playbookId } = await req.json();
 
   const { sessionId, getToken } = await auth();
   if (!sessionId) {
@@ -19,14 +19,14 @@ export async function POST(req: NextRequest) {
   const { data: lesson, error: le } = await client
     .from("lessons")
     .select("id, topic, mode")
-    .eq("id", lessonId)
+    .eq("id", playbookId)
     .single();
   if (le) return NextResponse.json({ error: le.message }, { status: 500 });
 
   const { data: cards, error: ce } = await client
     .from("lesson_cards")
     .select("id,title,phase,steps,position")
-    .eq("lesson_id", lessonId)
+    .eq("lesson_id", playbookId)
     .order("position");
   if (ce) return NextResponse.json({ error: ce.message }, { status: 500 });
 
@@ -59,7 +59,7 @@ Return JSON: { "cards": [ { "id": string, "steps": string[] } ] } (same ids).`;
   for (const c of out.cards) {
     await client.from("lesson_cards").update({ steps: c.steps }).eq("id", c.id);
   }
-  await client.from("lessons").update({ mode: "virtual" }).eq("id", lessonId);
+  await client.from("lessons").update({ mode: "virtual" }).eq("id", playbookId);
 
   return NextResponse.json({ ok: true });
 }

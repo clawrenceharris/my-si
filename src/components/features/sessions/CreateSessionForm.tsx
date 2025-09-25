@@ -112,8 +112,6 @@ export function CreateSessionForm() {
           />
         )}
       />
-
-      {errors.virtual && <FormMessage>{errors.virtual.message}</FormMessage>}
     </>
   );
 }

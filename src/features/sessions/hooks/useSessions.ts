@@ -1,11 +1,9 @@
-"use client";
-
 import { useSupabaseClient } from "@/providers/SupabaseClientProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SessionsService } from "../domain";
 import { SessionsInsert, SessionsUpdate } from "@/types/tables";
 
-export function useSessions(userId: string) {
+export function useSessions(userId?: string) {
   const client = useSupabaseClient();
   const service = new SessionsService(client);
   const queryClient = useQueryClient();
@@ -13,7 +11,7 @@ export function useSessions(userId: string) {
   const sessionsQuery = useQuery({
     queryKey: ["sessions", userId],
     queryFn: async () => {
-      return await service.getAllByUser(userId);
+      if (userId) return await service.getAllByUser(userId);
     },
     enabled: !!userId,
   });
