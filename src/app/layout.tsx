@@ -37,43 +37,45 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <html lang="en">
         <body>
-          <header className="fixed top-0 bg-background/30 right-0 m-6 rounded-full backdrop-blur-lg flex justify-end items-center p-2 gap-4  z-99">
-            <SignedIn>
-              <NavigationMenu>
-                <NavigationMenuList>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger className="rounded-full text-muted-foreground bg-gray-200 shadow-sm shadow-foreground/20">
-                      <Menu />
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <NavigationMenuLink href="/">
-                        <span className="inline-flex items-center gap-3">
-                          <Rocket className="inline" />
-                          Home
-                        </span>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink href="/sessions">
-                        <span className="inline-flex items-center gap-3">
-                          <Clock className="inline" />
-                          Sessions
-                        </span>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink href="/playbooks">
-                        <span className="inline-flex items-center gap-3">
-                          <Book className="inline" />
-                          Library
-                        </span>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <SignOutButton>
-                          <Button variant={"tertiary"}>Sign Out</Button>
-                        </SignOutButton>
-                      </NavigationMenuLink>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-            </SignedIn>
+          <header className="fixed top-0 p-6 justify-end flex w-full z-99">
+            <nav className="flex p-2  rounded-full backdrop-blur-lg bg-background/30 gap-4 justify-end items-center">
+              <SignedIn>
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger className="rounded-full shadow-sm shadow-foreground/20">
+                        <Menu />
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <NavigationMenuLink href="/">
+                          <span className="inline-flex items-center gap-3">
+                            <Rocket className="inline" />
+                            Home
+                          </span>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink href="/sessions">
+                          <span className="inline-flex items-center gap-3">
+                            <Clock className="inline" />
+                            Sessions
+                          </span>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink href="/playbooks">
+                          <span className="inline-flex items-center gap-3">
+                            <Book className="inline" />
+                            Playbooks
+                          </span>
+                        </NavigationMenuLink>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+              </SignedIn>
+              <SignedIn>
+                <SignOutButton>
+                  <Button variant={"tertiary"}>Sign Out</Button>
+                </SignOutButton>
+              </SignedIn>
+            </nav>
             <SignedOut>
               <SignInButton>
                 <Button variant={"tertiary"}>Sign In</Button>
@@ -82,7 +84,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <Button>Sign Up</Button>
               </SignUpButton>
             </SignedOut>
-            <SignedIn></SignedIn>
           </header>
           <QueryProvider>
             <SupabaseClientProvider>

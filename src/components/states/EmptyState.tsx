@@ -146,7 +146,7 @@ export function EmptyState({
   );
 
   const renderCard = () => (
-    <Card className="space-y-3 m-auto top-[50%] left-[50%] translate-[-50%] absolute flex flex-col justify-center max-w-md text-center">
+    <Card className="space-y-3 min-w-md  m-auto top-[50%] left-[50%] translate-[-50%] absolute flex flex-col justify-center max-w-xl text-center">
       {icon && <div className="flex justify-center mb-4">{icon}</div>}
       <CardTitle className="text-xl">{title}</CardTitle>
       {message && <CardDescription>{message}</CardDescription>}

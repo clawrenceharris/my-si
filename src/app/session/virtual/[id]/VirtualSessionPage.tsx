@@ -12,7 +12,7 @@ import {
   useCallStateHooks,
 } from "@stream-io/video-react-sdk";
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { Sessions } from "@/types/tables";
 import { ActivityPanel } from "@/components/features";
 import useLoadCall from "@/hooks/useLoadCall";
@@ -72,18 +72,29 @@ export default function VirtualSessionPage({ id }: VirtualSessionPageProps) {
   }
   if (!call) {
     return (
-      <EmptyState
-        variant="card"
-        title="Virtual Meeting not created."
-        actionLabel={sessionLoading ? "Loading..." : "Create Meeting"}
-        onAction={async () => {
-          const call = await createVirtualMeeting(session);
-          updateSession.mutate({
-            id: session.id,
-            data: { call_id: call?.id || null },
-          });
-        }}
-      />
+      <>
+        <SignedOut>
+          <EmptyState
+            variant="card"
+            title="The host didn't start this virtual call yet."
+            message="Once the call is started you will be redirected"
+          />
+        </SignedOut>
+        <SignedIn>
+          <EmptyState
+            variant="card"
+            title="Virtual Meeting not created yet."
+            actionLabel={sessionLoading ? "Loading..." : "Create Meeting"}
+            onAction={async () => {
+              const call = await createVirtualMeeting(session);
+              updateSession.mutate({
+                id: session.id,
+                data: { call_id: call?.id || null },
+              });
+            }}
+          />
+        </SignedIn>
+      </>
     );
   }
 
@@ -104,7 +115,6 @@ function MeetingScreen({ session }: { session: Sessions | null }) {
   const host = useCallCreatedBy();
   const local = useLocalParticipant();
   const remoteParticipants = useRemoteParticipants();
-
   const [activityPanelOpen, setActivityPanelOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("agenda");
 
@@ -125,59 +135,63 @@ function MeetingScreen({ session }: { session: Sessions | null }) {
   });
 
   return (
-    <div className="flex h-screen">
-      {/* {session && (
-        <ActivityPanel
-          playbookEngine={engine}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          isHost={isHost}
-          onOpenChange={setActivityPanelOpen}
-          open={activityPanelOpen}
-          session={session}
-        />
-      )} */}
-
-      <div className="flex flex-col flex-1">
-        {/* Local participant */}
-        {local && (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="relative w-full max-w-4xl aspect-video shadow-md rounded-xl overflow-hidden">
-              <ParticipantView
-                participant={local}
-                ParticipantViewUI={CustomParticipantViewUI}
-                VideoPlaceholder={CustomVideoPlaceholder}
-              />
-            </div>
-          </div>
+    <main className=" bg- ">
+      <div className="container">
+        {session && (
+          <ActivityPanel
+            playbookEngine={engine}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            isHost={isHost}
+            onOpenChange={setActivityPanelOpen}
+            open={activityPanelOpen}
+            session={session}
+          />
         )}
 
-        {remoteParticipants.length > 0 && (
-          <div className="flex flex-1 overflow-auto h-full gap-2 p-2 justify-center">
-            {remoteParticipants.map((p) => (
-              <div
-                key={p.sessionId}
-                className="relative w-40 h-full aspect-video rounded-lg overflow-hidden"
-              >
+        <div className="flex flex-col flex-1">
+          {/* Local participant */}
+          {local && (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="relative w-full max-w-4xl aspect-video shadow-md rounded-xl overflow-hidden">
                 <ParticipantView
-                  participant={p}
+                  participant={local}
                   ParticipantViewUI={CustomParticipantViewUI}
                   VideoPlaceholder={CustomVideoPlaceholder}
                 />
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          )}
+          {/* Other Participants */}
+          {remoteParticipants.length > 0 && (
+            <div className="flex flex-1 overflow-auto h-full gap-2 p-2 justify-center">
+              {remoteParticipants
+                .filter((p) => p.userId !== local?.userId)
+                .map((p) => (
+                  <div
+                    key={p.sessionId}
+                    className="relative w-40 h-full aspect-video rounded-lg overflow-hidden"
+                  >
+                    <ParticipantView
+                      participant={p}
+                      ParticipantViewUI={CustomParticipantViewUI}
+                      VideoPlaceholder={CustomVideoPlaceholder}
+                    />
+                  </div>
+                ))}
+            </div>
+          )}
 
-        <div className="bg-white fixed bottom-0 left-0 w-full flex justify-center">
-          <CustomCallControls
-            onPlaybookClick={() => {
-              setActivityPanelOpen(true);
-            }}
-            onShareClick={handleCopy}
-          />
+          <div className="bg-white fixed bottom-0 left-0 w-full flex justify-center">
+            <CustomCallControls
+              onPlaybookClick={() => {
+                setActivityPanelOpen(true);
+              }}
+              onShareClick={handleCopy}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -102,7 +102,7 @@ export function usePlaybookEngine(
         setIsLoading(true);
 
         await call.sendCustomEvent({ type: `${slug}:start` });
-        options?.onActivityEnd?.();
+        options?.onActivityStart?.();
         setIsLoading(false);
       } catch (error) {
         alert(

@@ -45,8 +45,8 @@ export const useModal = ({
   const ModalComponent = (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogPortal>
-        <DialogOverlay />
-        <DialogContent>
+        <DialogOverlay className="z-99" />
+        <DialogContent className="z-999">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
@@ -65,9 +65,9 @@ export const useModal = ({
   );
 
   return {
+    modal: ModalComponent,
     closeModal,
     openModal,
-    modal: open ? ModalComponent : null,
     isModalOpen: open,
   };
 };

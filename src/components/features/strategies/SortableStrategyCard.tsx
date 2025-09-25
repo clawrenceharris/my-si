@@ -1,16 +1,32 @@
 import { useSortable } from "@dnd-kit/sortable";
 import React from "react";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, Card, CardContent, CardHeader } from "@/components/ui";
-import { Bookmark, Brain, Dumbbell, Lightbulb, Wand2 } from "lucide-react";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui";
+import {
+  Bookmark,
+  Brain,
+  Dumbbell,
+  Lightbulb,
+  ListRestart,
+  Wand2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LessonCards } from "@/types/tables";
 import clsx from "clsx";
 
 interface SortableStrategyCardProps {
-  card: LessonCards;
+  strategy: LessonCards;
   onCardStepsUpdate: (data: string[]) => void;
   onImproveClick: () => Promise<void>;
+  onReplaceClick: () => void;
 }
 
 const getCardBackgroundColor = (position: number) => {
@@ -40,7 +56,8 @@ export function CardGhost({ position }: { position: number }) {
 }
 
 export function SortableStrategyCard({
-  card,
+  strategy,
+  onReplaceClick,
   onImproveClick,
   onCardStepsUpdate,
 }: SortableStrategyCardProps) {
@@ -53,7 +70,7 @@ export function SortableStrategyCard({
     transition,
     index,
     isDragging,
-  } = useSortable({ id: card.id });
+  } = useSortable({ id: strategy.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -98,75 +115,78 @@ export function SortableStrategyCard({
         )}
       >
         <div className="min-w-[40px] min-h-[40px] bg-foreground/20 rounded-full flex items-center justify-center">
-          {getCardIcon(card.position)}
+          {getCardIcon(strategy.position)}
         </div>
         <div className="w-full">
           <div>
-            <h2 className="font-bold text-xl">{card.title} </h2>
+            <h2 className="font-bold text-xl">{strategy.title} </h2>
           </div>
           <div className="flex items-center  justify-between">
             <span className="uppercase font-light text-background/70 text-sm">
-              {card.position === 0
+              {strategy.position === 0
                 ? "warmup"
-                : card.position === 1
+                : strategy.position === 1
                 ? "workout"
                 : "closer"}
             </span>
             <div className="flex">
-              <Button
-                className="rounded-full"
-                variant={"ghost"}
-                size={"sm"}
-                aria-label="Add to favorites"
-                onMouseEnter={(e) => {
-                  const text = document.createElement("p");
-                  text.textContent = "Save";
+              <Tooltip>
+                <TooltipContent>Replace</TooltipContent>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="rounded-full"
+                    variant={"ghost"}
+                    size={"sm"}
+                    aria-label="Replace strategy"
+                    onClick={onReplaceClick}
+                  >
+                    <ListRestart />
+                  </Button>
+                </TooltipTrigger>
+              </Tooltip>
 
-                  e.currentTarget.appendChild(text);
-                }}
-                onMouseLeave={(e) => {
-                  if (e.currentTarget.lastChild) {
-                    e.currentTarget.removeChild(e.currentTarget.lastChild);
-                  }
-                }}
-              >
-                <Bookmark />
-              </Button>
-
-              <Button
-                className="rounded-full"
-                variant={"ghost"}
-                onClick={handleImproveClick}
-                size={"sm"}
-                aria-label="Add to favorites"
-                onMouseEnter={(e) => {
-                  const text = document.createElement("p");
-                  text.textContent = "AI Enhance";
-
-                  e.currentTarget.appendChild(text);
-                }}
-                onMouseLeave={(e) => {
-                  if (e.currentTarget.lastChild) {
-                    e.currentTarget.removeChild(e.currentTarget.lastChild);
-                  }
-                }}
-              >
-                <Wand2 />
-              </Button>
+              <Tooltip>
+                <TooltipContent>Save</TooltipContent>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="rounded-full"
+                    variant={"ghost"}
+                    size={"sm"}
+                    aria-label="Save strategy"
+                  >
+                    <Bookmark />
+                  </Button>
+                </TooltipTrigger>
+              </Tooltip>
+              <Tooltip>
+                <TooltipContent color="white">AI Enhance</TooltipContent>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="rounded-full"
+                    variant={"ghost"}
+                    onClick={handleImproveClick}
+                    size={"sm"}
+                    aria-label="Enhance with AI"
+                  >
+                    <Wand2 />
+                  </Button>
+                </TooltipTrigger>
+              </Tooltip>
             </div>
           </div>
         </div>
       </CardHeader>
       <CardContent className="p-6">
         <ol className="text-foreground/80 space-y-4">
-          {card.steps.map((s: string, i: number) => (
+          {strategy.steps.map((s: string, i: number) => (
             <li className="flex items-center gap-1 " key={i}>
               <div
                 className={`text-pr min-w-7 min-h-7  rounded-full items-center justify-center flex ${clsx(
                   {
-                    "text-success-500 bg-success-100": card.position === 0,
-                    "text-secondary-500 bg-secondary-100": card.position === 1,
-                    "text-accent-400 bg-accent-100": card.position === 2,
+                    "text-success-500 bg-success-100": strategy.position === 0,
+                    "text-secondary-500 bg-secondary-100":
+                      strategy.position === 1,
+                    "text-accent-400 bg-accent-100": strategy.position === 2,
                   }
                 )}`}
               >
@@ -179,9 +199,9 @@ export function SortableStrategyCard({
                 suppressContentEditableWarning
                 onBlur={(e) => {
                   onCardStepsUpdate([
-                    ...card.steps.slice(0, i),
+                    ...strategy.steps.slice(0, i),
                     e.currentTarget.textContent || "",
-                    ...card.steps.slice(i + 1),
+                    ...strategy.steps.slice(i + 1),
                   ]);
                 }}
               >

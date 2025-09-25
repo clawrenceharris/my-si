@@ -19,12 +19,7 @@ export function useVirtualMeeting() {
     try {
       setIsLoading(true);
 
-      const {
-        topic,
-        description,
-        scheduled_start: starts_at,
-        course_name,
-      } = session;
+      const { topic, description, scheduled_start, course_name } = session;
 
       const id = crypto.randomUUID();
 
@@ -32,7 +27,7 @@ export function useVirtualMeeting() {
 
       await call.getOrCreate({
         data: {
-          starts_at,
+          starts_at: new Date(scheduled_start).toISOString(),
           members: [
             {
               user_id: user.id,

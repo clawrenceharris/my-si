@@ -1,28 +1,29 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { ChatFormData } from "@/features/chat";
-import { ChatInput } from "@/components/features";
 import { useAsyncOperation } from "@/hooks";
+import { GeneratePlaybookInput } from "@/features/playbooks/domain/playbooks.schema";
+import { GeneratePlaybookForm } from "@/components/features";
 
 export default function Dashboard() {
   const router = useRouter();
   const { execute: handleSubmit, loading } = useAsyncOperation<
-    [{ topic: string; mode: string }],
+    [GeneratePlaybookInput],
     void
-  >(async (data) => await create(data));
-  const create = async (data: ChatFormData) => {
-    const { topic, mode } = data;
+  >(async (data) => {
+    const r = await generatePlaybook(data);
+    if (r.playbookId) router.push(`/playbooks/${r.playbookId}`);
+  });
+  async function generatePlaybook(data: GeneratePlaybookInput) {
+    const { topic, virtual, course_name, contexts } = data;
     const r = await fetch("/api/lessons/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic, mode }),
+      body: JSON.stringify({ contexts, topic, virtual, course_name }),
     });
-    const out = await r.json();
-    if (out.lessonId) router.push(`/lessons/${out.lessonId}`);
-  };
-
+    return await r.json();
+  }
   return (
-    <main className="mx-auto bg-gradient-to-br from-primary-300  to-primary-600">
+    <main>
       <section className="container">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
@@ -36,18 +37,17 @@ export default function Dashboard() {
               <div className="bg-white rounded-xl p-8 shadow-lg">
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    Plan your Lesson
+                    Create a Playbook
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Describe your topic and to compose a comprehensive lesson
-                    plan with engaging Playbooks.
+                    Enter the course and topic you plan to instruct to compose a
+                    comprehensive Playbook (or lesson plan) plan with engaging
+                    SI strategies.
                   </p>
                 </div>
 
-                <ChatInput
-                  placeholder="What topic would you like to create a lesson for?"
-                  disabled={loading}
-                  loading={loading}
+                <GeneratePlaybookForm
+                  isLoading={loading}
                   onSubmit={handleSubmit}
                 />
               </div>
@@ -61,7 +61,7 @@ export default function Dashboard() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {[
-                "Algebra basics for 9th graders",
+                "College Algebra ",
                 "Introduction to photosynthesis",
                 "Creative writing techniques",
                 "World War II timeline",

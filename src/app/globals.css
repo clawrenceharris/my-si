@@ -149,35 +149,23 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --input: #edeff1;
-  --border: #f2f5fa;
+  --input: #e1e6ec;
+  --border: #e1e5eb;
   --ring: #93c5fd;
 }
-.str-video {
-  --str-video__primary-color: var(--color-primary-400);
-  --str-video__secondary-color: #90ee02;
-  --str-video__text-color1: #282b2b;
-  --str-video__border-radius-circle: 15px;
-}
 
-.str-video__participant-details {
-  color: white;
-}
-.str-video__menu-container {
-  color: white;
-}
-.str-video__notification {
-  color: white;
-}
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply h-screen;
+    @apply min-h-screen bg-gradient-to-br from-primary-300 to-primary-600;
   }
   main {
-    @apply text-foreground  h-full;
+    @apply min-h-screen text-foreground;
+  }
+  h1 {
+    @apply text-4xl font-bold;
   }
 }
 @layer components {
@@ -186,7 +174,7 @@
       hover:shadow-lg bg-secondary-50;
   }
   .container {
-    @apply px-12 py-8 max-w-6xl;
+    @apply px-12 mx-auto space-y-14 h-full  max-w-6xl py-30;
   }
   .btn {
     @apply inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0;
@@ -202,7 +190,7 @@
     @apply bg-secondary-500 text-primary-foreground hover:bg-secondary-600;
   }
   .btn-tertiary {
-    @apply bg-primary-foreground text-foreground hover:bg-primary-foreground/50;
+    @apply bg-primary-foreground shadow-md shadow-foreground/10 text-foreground hover:bg-primary-foreground/50;
   }
   .btn-ghost {
     @apply hover:bg-foreground/20;
@@ -212,7 +200,7 @@
   }
 
   .btn-outline {
-    @apply border border-border text-foreground hover:bg-muted;
+    @apply border border text-foreground hover:bg-muted;
   }
 
   .card {

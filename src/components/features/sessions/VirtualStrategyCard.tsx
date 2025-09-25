@@ -4,6 +4,7 @@ import { Brain, Dumbbell, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LessonCards } from "@/types/tables";
 import { SignedIn } from "@clerk/nextjs";
+import { registry } from "@/activities/registry";
 
 interface VirtualStrategyCardProps {
   card: LessonCards;
@@ -37,7 +38,7 @@ export function VirtualStrategyCard({
         return <Lightbulb />;
     }
   };
-  if (card.card_slug === "snowball") console.log(card);
+  console.log(card.card_slug);
 
   return (
     <Card className="strategy-card flex-1 p-0 relative rounded-2xl border border-border shadow-md bg-card text-card-foreground transition-transform">
@@ -68,13 +69,15 @@ export function VirtualStrategyCard({
       <CardContent>
         {isHost ? (
           <SignedIn>
-            {card.virtualized && (
+            {registry[card.card_slug] && (
               <div className="space-y-5">
                 <p className="text-muted-foreground bg-muted rounded-xl py-3 px-5 text-sm">
                   This strategy is set up for Virtual Playbook
                 </p>
 
-                <Button onClick={onStartClick}>Run Play: {card.title}</Button>
+                <Button onClick={onStartClick}>
+                  Run Strategy: {card.title}
+                </Button>
               </div>
             )}
           </SignedIn>

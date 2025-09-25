@@ -1,5 +1,5 @@
 "use client";
-import { FormLayout } from "@/components/forms";
+import { FormLayout } from "@/components/layouts";
 import {
   Button,
   Card,
@@ -93,7 +93,7 @@ export function SessionCard({ session }: SessionCardProps) {
           id: session.id,
           data: { status: "active" },
         });
-      if (session.virtual) {
+      else if (session.virtual) {
         router.push(`/session/virtual/${session.id}`);
       }
     } catch {}
@@ -174,7 +174,7 @@ export function SessionCard({ session }: SessionCardProps) {
 
                 <DropdownMenuItem
                   variant="destructive"
-                  onClick={async () => await updateSessionStatus("completed")}
+                  onClick={async () => await updateSessionStatus("canceled")}
                 >
                   Cancel Session
                 </DropdownMenuItem>
@@ -206,7 +206,7 @@ export function SessionCard({ session }: SessionCardProps) {
             className="rounded-tr-none rounded-br-none "
             onClick={handleStartSession}
           >
-            Start Session
+            {session.status === "active" ? "Join" : "Start Session"}
           </Button>
           <Tooltip>
             <TooltipTrigger asChild>

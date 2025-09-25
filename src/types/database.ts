@@ -44,7 +44,7 @@ export type Database = {
             foreignKeyName: "activity_flows_card_slug_fkey"
             columns: ["card_slug"]
             isOneToOne: false
-            referencedRelation: "strategy_cards"
+            referencedRelation: "strategies"
             referencedColumns: ["slug"]
           },
         ]
@@ -164,28 +164,31 @@ export type Database = {
       }
       lessons: {
         Row: {
+          course_name: string | null
           created_at: string | null
           id: string
-          mode: string
           topic: string
           updated_at: string | null
           user_id: string | null
+          virtual: boolean | null
         }
         Insert: {
+          course_name?: string | null
           created_at?: string | null
           id?: string
-          mode?: string
           topic: string
           updated_at?: string | null
           user_id?: string | null
+          virtual?: boolean | null
         }
         Update: {
+          course_name?: string | null
           created_at?: string | null
           id?: string
-          mode?: string
           topic?: string
           updated_at?: string | null
           user_id?: string | null
+          virtual?: boolean | null
         }
         Relationships: []
       }
@@ -351,7 +354,7 @@ export type Database = {
           },
         ]
       }
-      strategy_cards: {
+      strategies: {
         Row: {
           category: string | null
           course_tags: string[]
@@ -393,6 +396,57 @@ export type Database = {
           title?: string
           virtual_friendly?: boolean
           virtualized?: boolean | null
+        }
+        Relationships: []
+      }
+      strategy_contexts: {
+        Row: {
+          context: string
+          id: string
+          strategy_slug: string
+        }
+        Insert: {
+          context: string
+          id?: string
+          strategy_slug: string
+        }
+        Update: {
+          context?: string
+          id?: string
+          strategy_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strategy_contexts_context_fkey"
+            columns: ["context"]
+            isOneToOne: false
+            referencedRelation: "student_contexts"
+            referencedColumns: ["context"]
+          },
+          {
+            foreignKeyName: "strategy_contexts_strategy_slug_fkey"
+            columns: ["strategy_slug"]
+            isOneToOne: false
+            referencedRelation: "strategies"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      student_contexts: {
+        Row: {
+          context: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          context: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          context?: string
+          created_at?: string
+          id?: string
         }
         Relationships: []
       }
@@ -464,6 +518,17 @@ export type Database = {
       get_session_summary: {
         Args: { session_uuid: string }
         Returns: Json
+      }
+      get_strategies_by_contexts: {
+        Args: { contexts: string[] }
+        Returns: {
+          category: string
+          good_for: string[]
+          session_size: Database["public"]["Enums"]["session_size"]
+          slug: string
+          title: string
+          virtual_friendly: boolean
+        }[]
       }
       refresh_session_dashboard_stats: {
         Args: Record<PropertyKey, never>

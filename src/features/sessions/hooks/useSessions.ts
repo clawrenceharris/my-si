@@ -1,5 +1,3 @@
-"use client";
-
 import { useSupabaseClient } from "@/providers/SupabaseClientProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SessionsService } from "../domain";

@@ -35,7 +35,7 @@ export class ProfileService {
         throw new Error(AppErrorCode.PERMISSION_DENIED);
       }
 
-      return await this.repository.getBy("user_id", userId);
+      return await this.repository.getSingleBy("user_id", userId);
     } catch (error) {
       throw normalizeError(error);
     }

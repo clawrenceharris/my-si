@@ -6,13 +6,12 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui";
-import { useLesson } from "@/features/lessons/hooks";
+import { usePlaybook } from "@/features/playbooks/hooks";
 import { UseVirtualPlaybookReturn } from "@/hooks";
 import { Sessions } from "@/types/tables";
 import { VirtualStrategyCard } from "./VirtualStrategyCard";
@@ -29,12 +28,12 @@ export function ActivityPanel({
   session: Sessions;
   playbookEngine: UseVirtualPlaybookReturn;
   isHost: boolean;
-  onTabChange: (string) => void;
+  onTabChange: (tab: string) => void;
   open: boolean;
   activeTab: string;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { cards, isLoading: loadingLesson } = useLesson(session.lesson_id);
+  const { playbook, isLoading: loadingLesson } = usePlaybook(session.lesson_id);
   const {
     startActivity,
     endActivity,
@@ -45,12 +44,6 @@ export function ActivityPanel({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetTrigger asChild>
-          <Button variant={"tertiary"} size="icon">
-            Open
-          </Button>
-        </SheetTrigger>
-
         <SheetContent className="p-6  overflow-auto" side="left">
           <SheetDescription className="sr-only">
             Access the agenda, activities and chat for this session
@@ -80,9 +73,9 @@ export function ActivityPanel({
             <TabsContent value="agenda">
               {loadingLesson ? (
                 <LoadingState size={40} />
-              ) : cards.length > 0 ? (
+              ) : playbook?.strategies && playbook.strategies.length > 0 ? (
                 <ul className="space-y-6">
-                  {cards.map((c) => (
+                  {playbook.strategies.map((c) => (
                     <li key={c.id}>
                       <VirtualStrategyCard
                         isHost={isHost}
@@ -104,8 +97,14 @@ export function ActivityPanel({
               {loadingActivity ? (
                 <LoadingState />
               ) : activity ? (
-                <>
-                  <h2>Playbook: {activity.title}</h2>
+                <div className="space-y-9">
+                  <div className="flex gap-5 items-center justify-between bg-white rounded-full border-2 border-gray-200 px-7 py-2 ">
+                    <h2>{activity.title}</h2>
+
+                    <span className="text-xs max-w-20 flex items-center justify-center px-2 py-1 rounded-full font-medium capitalize bg-success-100 text-success-500">
+                      {session.status.replace("_", " ")}
+                    </span>
+                  </div>
 
                   <activity.Component ctx={ctx} />
                   <div className="absolute flex gap-3 bottom-6">
@@ -116,13 +115,13 @@ export function ActivityPanel({
                     )}
                     {isHost && <activity.HostControls ctx={ctx} />}
                   </div>
-                </>
+                </div>
               ) : (
                 <div className="h-full flex flex-col justify-center items-center">
                   {isHost ? (
-                    <EmptyState message="No Play has been started yet. Start one by clicking 'Run Play' in the Agenda tab." />
+                    <EmptyState message="No Strategy has been started yet. Start one by clicking 'Run Play' in the Agenda tab." />
                   ) : (
-                    <EmptyState message="No Play has been started yet. When the host starts one, you will see it here." />
+                    <EmptyState message="No Strategy has been started yet. When the host starts one, you will see it here." />
                   )}
                 </div>
               )}
