@@ -1,5 +1,5 @@
 "use client";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormLayout } from "@/components/layouts";
@@ -7,12 +7,12 @@ import { LoginFormInput, loginSchema } from "@/features/auth/domain";
 import { LoginForm } from "@/features/auth/components";
 import { useAuth } from "@/features/auth/hooks";
 
-export default function LoginPage({ searchParams }) {
+export default function LoginPage() {
   const router = useRouter();
   const { login, isLoading, resetPassword } = useAuth();
 
-  const nextPath = "/";
-  const redirectTo = searchParams.get("redirectTo");
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") ?? "/";
 
   return (
     <main className="flex flex-col justify-center">
@@ -37,12 +37,6 @@ export default function LoginPage({ searchParams }) {
               if (redirectTo) {
                 redirect(redirectTo);
               }
-              const url = nextPath
-                ? `/auth/signup?next=${encodeURIComponent(
-                    nextPath
-                  )}?redirectTo=${redirectTo}`
-                : `/auth/signup?redirectTo=${redirectTo}`;
-              router.push(url);
             }}
           />
         </FormLayout>
