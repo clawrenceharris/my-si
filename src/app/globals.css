@@ -159,10 +159,10 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply h-screen w-screen bg-gradient-to-br from-primary-300 to-primary-600;
+    @apply w-screen bg-gradient-to-br from-primary-300 to-primary-600;
   }
   main {
-    @apply relative h-full text-foreground;
+    @apply relative h-full min-h-screen text-foreground;
   }
   h1 {
     @apply text-4xl font-bold;
@@ -171,7 +171,7 @@
     @apply text-xl font-bold;
   }
   button {
-    cursor: pointer;
+    @apply cursor-pointer;
   }
 }
 @layer components {
@@ -180,7 +180,7 @@
       hover:shadow-lg bg-secondary-50;
   }
   .container {
-    @apply relative p-20 mx-auto max-w-3xl space-y-10 h-full;
+    @apply relative px-15 pt-20 mx-auto max-w-3xl space-y-8 h-full;
   }
   .btn {
     @apply inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0;

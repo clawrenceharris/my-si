@@ -88,7 +88,7 @@ export function FormLayout<T extends FieldValues>({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
         {description && (
           <FormDescription style={descriptionStyle}>
             {description}

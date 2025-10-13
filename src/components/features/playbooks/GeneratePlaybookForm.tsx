@@ -92,7 +92,7 @@ export default function GeneratePlaybookForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Context Tags</FormLabel>
-                  <div className="flex gap-4 max-h-40 overflow-auto flex-wrap">
+                  <div className="faded-col p-4 flex gap-4 max-h-40 overflow-auto flex-wrap">
                     {contextsLoading ? (
                       <LoadingState variant="container" />
                     ) : (

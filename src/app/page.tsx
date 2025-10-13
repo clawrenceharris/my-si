@@ -23,8 +23,8 @@ export default function Dashboard() {
     return await r.json();
   }
   return (
-    <main className="">
-      <div className="container">
+    <main>
+      <div className="container overflow-hidden">
         <div className="w-full max-w-2xl mx-auto">
           <div className="bg-white rounded-xl p-8 shadow-lg">
             <h3 className="text-lg  text-center font-semibold text-gray-900 mb-4">

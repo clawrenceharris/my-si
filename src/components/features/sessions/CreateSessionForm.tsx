@@ -5,23 +5,18 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  Label,
-  Switch,
   Textarea,
 } from "@/components/ui";
 import { CreateSessionInput } from "@/features/sessions/domain";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 export default function CreateSessionForm() {
   const {
     control,
-    watch,
 
     formState: { errors },
   } = useFormContext<CreateSessionInput>();
 
-  const watched = watch("virtual");
-  console.log(watched);
   return (
     <>
       <FormField
@@ -51,7 +46,6 @@ export default function CreateSessionForm() {
       {errors.topic && <FormMessage>{errors.topic.message}</FormMessage>}
       <FormField
         name="description"
-        defaultValue=""
         control={control}
         render={({ field }) => (
           <FormItem>
@@ -68,7 +62,6 @@ export default function CreateSessionForm() {
       <div className="flex gap-4">
         <FormField
           name="start_date"
-          defaultValue=""
           control={control}
           render={({ field }) => (
             <FormItem>
@@ -82,7 +75,6 @@ export default function CreateSessionForm() {
 
         <FormField
           name="start_time"
-          defaultValue=""
           control={control}
           render={({ field }) => (
             <FormItem>
@@ -100,7 +92,7 @@ export default function CreateSessionForm() {
         </FormMessage>
       )}
 
-      <Label htmlFor="virtual">Virtual:</Label>
+      {/* <Label htmlFor="virtual">Virtual:</Label>
       <Controller
         name="virtual"
         control={control}
@@ -111,7 +103,7 @@ export default function CreateSessionForm() {
             id="virtual"
           />
         )}
-      />
+      /> */}
     </>
   );
 }

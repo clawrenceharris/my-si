@@ -60,10 +60,25 @@ export default function PlaybooksPage() {
   }
   if (error || !playbooks) {
     return (
-      <ErrorState
-        variant="card"
-        message="There was an error finding your Playbooks"
-      />
+      <main>
+        <ErrorState
+          variant="card"
+          message="There was an error finding your Playbooks"
+        />
+      </main>
+    );
+  }
+  if (!playbooks.length) {
+    return (
+      <main>
+        {createPlaybookModal}
+        <EmptyState
+          actionLabel="Create Playbook"
+          onAction={openCreatePlaybookModal}
+          variant="card"
+          message="You don't have any Playbooks at the moment."
+        />
+      </main>
     );
   }
   return (
@@ -71,41 +86,33 @@ export default function PlaybooksPage() {
       {createPlaybookModal}
       <div className="container py-30 space-y-10">
         <h1 className="text-white">My Playbooks</h1>
-        {playbooks.length === 0 ? (
-          <EmptyState
-            actionLabel="Create Playbook"
-            onAction={openCreatePlaybookModal}
-            variant="card"
-            message="You don't have any Playbooks yet"
-          />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {playbooks.map((p) => (
-              <Card
-                key={p.id}
-                className="overflow-hidden flex justify-between flex-col max-w-md hover:shadow-md transition-shadow duration-200"
-              >
-                <CardHeader>
-                  <div className="flex justify-between items-center"></div>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-md font-semibold">
-                      {`${p.course_name ? p.course_name + ":" : ""}`}{" "}
-                      <span className="font-light">{p.topic}</span>
-                    </CardTitle>
-                  </div>
-                </CardHeader>
 
-                <CardFooter className="flex gap-5 justify-end">
-                  <div className="flex gap-0.5 items-center">
-                    <Button onClick={() => router.push(`/playbooks/${p.id}`)}>
-                      View
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {playbooks.map((p) => (
+            <Card
+              key={p.id}
+              className="overflow-hidden flex justify-between flex-col max-w-md hover:shadow-md transition-shadow duration-200"
+            >
+              <CardHeader>
+                <div className="flex justify-between items-center"></div>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-md font-semibold">
+                    {`${p.course_name ? p.course_name + ":" : ""}`}{" "}
+                    <span className="font-light">{p.topic}</span>
+                  </CardTitle>
+                </div>
+              </CardHeader>
+
+              <CardFooter className="flex gap-5 justify-end">
+                <div className="flex gap-0.5 items-center">
+                  <Button onClick={() => router.push(`/playbooks/${p.id}`)}>
+                    View
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
       </div>
     </main>
   );

@@ -18,9 +18,11 @@ import {
 import { Book, Clock, Menu, Notebook, Rocket } from "lucide-react";
 import { SignedIn, SignedOut } from "@/features/auth/components";
 import { useAuth } from "@/features/auth/hooks";
+import { useRouter } from "next/navigation";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const { signOut } = useAuth();
+  const router = useRouter();
   return (
     <html lang="en">
       <body>
@@ -66,8 +68,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </Button>
             </SignedIn>
             <SignedOut>
-              <Button variant={"tertiary"}>Sign In</Button>
-              <Button>Sign Up</Button>
+              <Button
+                onClick={() => router.replace("/auth/login")}
+                variant={"tertiary"}
+              >
+                Sign In
+              </Button>
+              <Button onClick={() => router.replace("/auth/signup")}>
+                Sign Up
+              </Button>
             </SignedOut>
           </nav>
         </header>

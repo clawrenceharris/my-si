@@ -10,12 +10,18 @@ import {
 import { useSessions } from "@/features/sessions/hooks";
 import { useModal } from "@/hooks";
 import { useUser } from "@/providers";
+import {
+  getFormattedCurrentDateTime,
+  getFormattedCurrentTime,
+} from "@/utils/date-time";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 
 export default function SessionsPage() {
   const { user } = useUser();
-  const { sessions, refetch, isLoading, error } = useSessions(user.id);
+  const { sessions, addSession, refetch, isLoading, error } = useSessions(
+    user.id
+  );
   const router = useRouter();
   const {
     modal: createSessionModal,
@@ -27,10 +33,22 @@ export default function SessionsPage() {
     hidesDescription: true,
     children: (
       <FormLayout<CreateSessionInput>
+        defaultValues={{
+          topic: "",
+          course_name: "",
+          description: "",
+          start_date: getFormattedCurrentDateTime(),
+          start_time: getFormattedCurrentTime(),
+        }}
+        isLoading={addSession.isPending}
         resolver={zodResolver(createSessionSchema)}
         onCancel={() => closeSessionCreationModal()}
-        onSubmit={() => {
-          closeSessionCreationModal();
+        onSuccess={() => closeSessionCreationModal()}
+        onSubmit={(data) => {
+          const { start_date, start_time, ...rest } = data; //exclude start date and time
+
+          const startDateTime = `${start_date.split("T")[0]}T${start_time}`;
+          addSession.mutateAsync({ ...rest, scheduled_start: startDateTime });
           refetch();
         }}
       >
@@ -42,7 +60,7 @@ export default function SessionsPage() {
   if (isLoading) {
     return <LoadingState />;
   }
-  if (error) {
+  if (error || !sessions) {
     return (
       <ErrorState
         variant="card"
@@ -51,24 +69,30 @@ export default function SessionsPage() {
       />
     );
   }
-  if (!sessions) {
+  if (!sessions.length) {
     return (
-      <EmptyState
-        variant="card"
-        className="text-white"
-        title="You don't have any sessions yet."
-        onAction={openSessionCreationModal}
-      />
+      <>
+        {createSessionModal}
+        <EmptyState
+          variant="card"
+          className="text-white"
+          message="You don't have any sessions at the moment."
+          onAction={openSessionCreationModal}
+          actionLabel="Create Session"
+        />
+      </>
     );
   }
 
   return (
     <main>
+      {createSessionModal}
+
       <div className="container py-30 ">
         <h1 className="text-white">My Sessions</h1>
-        {createSessionModal}
+
         <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-          {sessions?.map((session) => (
+          {sessions.map((session) => (
             <SessionCard key={session.id} session={session} />
           ))}
         </div>

@@ -1,5 +1,5 @@
 "use client";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormLayout } from "@/components/layouts";
@@ -11,8 +11,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, isLoading, resetPassword } = useAuth();
 
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? "/";
+  const nextPath = "/";
 
   return (
     <main className="flex flex-col justify-center">
@@ -27,16 +26,16 @@ export default function LoginPage() {
           resolver={zodResolver(loginSchema)}
           onSubmit={login}
           onSuccess={() => {
-            if (redirectTo) redirect(redirectTo);
-            else router.replace("/");
+            router.replace("/");
           }}
         >
           <LoginForm
             onForgotPassword={resetPassword}
             onSwitchToSignup={() => {
-              if (redirectTo) {
-                redirect(redirectTo);
-              }
+              const url = nextPath
+                ? `/auth/signup?next=${encodeURIComponent(nextPath)}`
+                : `/auth/signup`;
+              router.push(url);
             }}
           />
         </FormLayout>

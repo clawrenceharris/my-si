@@ -5,7 +5,6 @@ export const createSessionSchema = z.object({
   start_time: z.iso.time("Invalid time"),
   course_name: z.string().nonoptional(),
   topic: z.string().nonoptional(),
-  virtual: z.boolean(),
   description: z.string(),
   status: z
     .enum(["active", "completed", "canceled", "scheduled"])
