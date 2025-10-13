@@ -39,7 +39,7 @@ export default function PlayfieldExpanded() {
       className="flex w-full h-full min-h-[340px] max-w-2xl mx-auto overflow-hidden bg-background/95 backdrop-blur-xl  rounded-2xl shadow-2xl"
     >
       {strategy ? (
-        <div className="relative w-full flex flex-col justify-between  flex-1">
+        <div className="relative w-full flex flex-col justify-between h-full flex-1">
           <AnimatePresence mode="sync">
             {reactions.map(({ userId, id, emoji }) => (
               <motion.span
