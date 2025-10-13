@@ -27,7 +27,7 @@ export interface ErrorStateProps {
   /** The error title/heading */
   title?: string;
   /** Detailed error message */
-  message?: string;
+  message?: string | null;
   /** Custom icon to display (overrides default) */
   icon?: React.ReactNode;
   /** Callback function for retry action */
@@ -184,7 +184,7 @@ export function ErrorState({
   );
 
   const renderCard = () => (
-    <Card className="space-y-3 m-auto top-[50%] left-[50%] translate-[-50%] absolute flex flex-col justify-center max-w-md text-center">
+    <Card className="space-y-3 m-auto top-[50%] left-[50%] translate-[-50%] absolute flex flex-col justify-center max-w-md min-w-sm text-center">
       <CardHeader>
         <CardTitle className="text-2xl">Something went wrong.</CardTitle>
       </CardHeader>

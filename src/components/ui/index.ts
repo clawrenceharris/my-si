@@ -18,3 +18,5 @@ export * from "./sheet";
 export * from "./drawer";
 export * from "./avatar";
 export * from "./toggle";
+export * from "./sonner";
+export * from "./carousel";

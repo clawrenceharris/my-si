@@ -1,6 +1,6 @@
 "use client";
 
-import { GeneratePlaybookForm } from "@/components/features";
+import { GeneratePlaybookForm } from "@/components/features/playbooks";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 import {
   Button,
@@ -69,7 +69,7 @@ export default function PlaybooksPage() {
   return (
     <main>
       {createPlaybookModal}
-      <div className="container">
+      <div className="container py-30 space-y-10">
         <h1 className="text-white">My Playbooks</h1>
         {playbooks.length === 0 ? (
           <EmptyState

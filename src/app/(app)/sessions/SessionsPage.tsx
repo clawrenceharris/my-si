@@ -1,6 +1,6 @@
 "use client";
 
-import { CreateSessionForm, SessionCard } from "@/components/features";
+import { CreateSessionForm, SessionCard } from "@/components/features/sessions";
 import { FormLayout } from "@/components/layouts";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 import {
@@ -15,9 +15,8 @@ import { useRouter } from "next/navigation";
 
 export default function SessionsPage() {
   const { user } = useUser();
-  const { sessionsQuery } = useSessions(user.id);
+  const { sessions, refetch, isLoading, error } = useSessions(user.id);
   const router = useRouter();
-  const { data: sessions, error } = sessionsQuery;
   const {
     modal: createSessionModal,
     openModal: openSessionCreationModal,
@@ -32,7 +31,7 @@ export default function SessionsPage() {
         onCancel={() => closeSessionCreationModal()}
         onSubmit={() => {
           closeSessionCreationModal();
-          sessionsQuery.refetch();
+          refetch();
         }}
       >
         <CreateSessionForm />
@@ -40,7 +39,7 @@ export default function SessionsPage() {
     ),
   });
 
-  if (sessionsQuery.isLoading) {
+  if (isLoading) {
     return <LoadingState />;
   }
   if (error) {
@@ -65,7 +64,7 @@ export default function SessionsPage() {
 
   return (
     <main>
-      <div className="container">
+      <div className="container py-30 ">
         <h1 className="text-white">My Sessions</h1>
         {createSessionModal}
         <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">

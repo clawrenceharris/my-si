@@ -1,17 +1,16 @@
 "use client";
 
 import React from "react";
-import { FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { FormField, FormItem, FormMessage } from "@/components/ui";
 
 import { useFormContext } from "react-hook-form";
 import { useStrategies } from "@/features/strategies/hooks";
 import { EmptyState, LoadingState } from "@/components/states";
 import { Label } from "@/components/ui";
-import { StrategySearchField } from "./StrategySearchField";
+import { StrategySearchField, StrategyCard } from "./";
 import { Strategies } from "@/types/tables";
-import { StrategyCard } from "./StrategyCard";
 
-export function StrategySelectionForm() {
+export default function StrategySelectionForm() {
   const { strategies, isLoading } = useStrategies();
 
   const { control, watch } = useFormContext<{ strategy: Strategies }>();

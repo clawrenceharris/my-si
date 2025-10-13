@@ -9,7 +9,7 @@ interface StrategyCardProps {
   showsSteps?: boolean;
 }
 
-export function StrategyCard({
+export default function StrategyCard({
   onClick,
   strategy,
   selected,

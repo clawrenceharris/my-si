@@ -17,32 +17,34 @@ import {
 import { ErrorState, LoadingState } from "@/components/states";
 import { usePlaybook } from "@/features/playbooks/hooks/usePlaybook";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   restrictToFirstScrollableAncestor,
   restrictToWindowEdges,
 } from "@dnd-kit/modifiers";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { LessonCards, Strategies } from "@/types/tables";
-import {
-  CreateSessionForm,
-  SortableStrategyCard,
-  CardGhost,
-} from "@/components/features";
-import { useSessions } from "@/features/sessions/hooks";
+
+import { useSession, useSessions } from "@/features/sessions/hooks";
 import { useUser } from "@/providers";
 import { CreateSessionInput } from "@/features/sessions/domain";
 import { FormLayout } from "@/components/layouts";
 import { useModal } from "@/hooks";
-import { StrategySelectionForm } from "@/components/features/strategies/StrategySelectionForm";
 import { useRouter } from "next/navigation";
-
+import moment from "moment";
+import { CreateSessionForm } from "@/components/features/sessions";
+import {
+  CardGhost,
+  SortableStrategyCard,
+  StrategySelectionForm,
+} from "@/components/features/strategies";
+import { Check } from "lucide-react";
 export default function PlaybookPage({ playbookId }: { playbookId: string }) {
   const [strategies, setStrategies] = useState<LessonCards[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const { user } = useUser();
-  const { addSession } = useSessions(user.id);
+  const { addSession, sessions } = useSessions(user.id);
   const [selectedStrategy, setSelectedStrategy] = useState<LessonCards | null>(
     null
   );
@@ -52,16 +54,22 @@ export default function PlaybookPage({ playbookId }: { playbookId: string }) {
     isLoading,
     updatePlaybookStrategy,
     updateStrategySteps,
+    isUpdating,
     reorderStrategies,
   } = usePlaybook(playbookId);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   );
+
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   useEffect(() => {
     setStrategies(playbook?.strategies || []);
   }, [playbook]);
-
+  const hasSession = useMemo(
+    () => sessions?.some((s) => s.lesson_id === playbookId),
+    [playbookId, sessions]
+  );
   const {
     modal: sessionCreationModal,
     openModal: openSessionCreationModal,
@@ -78,13 +86,10 @@ export default function PlaybookPage({ playbookId }: { playbookId: string }) {
         }}
         onCancel={() => closeSessionCreationModal()}
         isLoading={addSession.isPending}
-        onSubmit={async (data) => {
-          try {
-            await handleSessionSubmit(data);
-            closeStrategySelectionModal();
-          } catch (error) {
-            throw error;
-          }
+        onSubmit={(data) => handleSessionSubmit(data)}
+        onSuccess={() => {
+          closeSessionCreationModal();
+          router.push("/sessions");
         }}
       >
         <CreateSessionForm />
@@ -110,11 +115,16 @@ export default function PlaybookPage({ playbookId }: { playbookId: string }) {
         isLoading={updatePlaybookStrategy.isPending}
         onSubmit={async (data) => {
           if (selectedStrategy) {
-            const { steps, slug, title } = data.strategy;
+            const { description, category, steps, slug, title } = data.strategy;
             await updatePlaybookStrategy.mutateAsync({
-              playbookId: playbookId,
-              cardSlug: selectedStrategy.card_slug,
-              data: { steps, card_slug: slug, title },
+              strategyId: selectedStrategy.id,
+              data: {
+                steps,
+                card_slug: slug,
+                title,
+                description,
+                category: category || undefined,
+              },
             });
           }
 
@@ -132,11 +142,9 @@ export default function PlaybookPage({ playbookId }: { playbookId: string }) {
       const startDate = `${start_date.split("T")[0]}T${start_time}`;
       await addSession.mutateAsync({
         ...rest,
-        lesson_id: playbookId || "",
+        lesson_id: playbookId,
         scheduled_start: new Date(startDate).toISOString(),
       });
-      closeSessionCreationModal();
-      router.push("/sessions");
     } catch {}
   };
 
@@ -153,11 +161,29 @@ export default function PlaybookPage({ playbookId }: { playbookId: string }) {
       );
     }
   };
-
+  useEffect(() => {
+    if (isUpdating) setIsSaving(true);
+    if (!isUpdating) {
+      setTimeout(() => {
+        setIsSaving(false);
+      }, 900);
+    }
+  }, [isUpdating]);
   const handleReplaceClick = (strategy: LessonCards) => {
     setSelectedStrategy(strategy);
     openStrategySelectionModal();
   };
+  const lastUpdate = useMemo(() => {
+    if (!playbook) return null;
+    const lastUpdatedStrategy = playbook.strategies.find(
+      (s) =>
+        s.updated_at &&
+        playbook.updated_at &&
+        new Date(s.updated_at) > new Date(playbook.updated_at)
+    );
+    return lastUpdatedStrategy?.updated_at || playbook.updated_at;
+  }, [playbook]);
+
   if (isLoading) return <LoadingState />;
   if (!playbook) {
     return (
@@ -171,8 +197,25 @@ export default function PlaybookPage({ playbookId }: { playbookId: string }) {
       {strategySelectionModal}
       <div className="container">
         <div className="flex flex-col items-start md:flex-row gap-6 bg-background p-6 rounded-xl shadow-md justify-between md:items-center">
-          <h1 className="text-2xl font-semibold">Lesson: {playbook.topic}</h1>
-
+          <div className="space-y-2">
+            <h1 className="text-2xl font-semibold gap-3 flex items-center">
+              Lesson: {playbook.topic}
+              {hasSession && (
+                <span className="text-success-500 rounded-full px-2 py-1 text-xs bg-success-100">
+                  <Check className="inline" size={15} /> Session Created{" "}
+                </span>
+              )}
+            </h1>
+            {lastUpdate && (
+              <p className="text-muted-foreground text-sm">
+                {isSaving
+                  ? "Saving..."
+                  : `Saved ${moment(lastUpdate)
+                      .fromNow()
+                      .replace("a few seconds ago", "just now")}`}
+              </p>
+            )}
+          </div>
           <Button onClick={openSessionCreationModal}>Create Session</Button>
         </div>
         <DndContext
@@ -220,7 +263,6 @@ export default function PlaybookPage({ playbookId }: { playbookId: string }) {
                   key={s.id}
                   onCardStepsUpdate={(steps) =>
                     updateStrategySteps({
-                      playbookId: playbook.id,
                       strategyId: s.id,
                       steps,
                     })

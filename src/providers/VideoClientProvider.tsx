@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import {
   StreamVideo,
   StreamVideoClient,
@@ -9,12 +8,13 @@ import {
 import { useEffect, useState } from "react";
 import { getToken } from "../app/actions";
 import { LoadingState } from "@/components/states";
+import { useAuth } from "@/features/auth/hooks";
 
 interface ClientProviderProps {
   children: React.ReactNode;
 }
 
-export function VideoClientProvider({ children }: ClientProviderProps) {
+export default function VideoClientProvider({ children }: ClientProviderProps) {
   const videoClient = useInitializeVideoClient();
 
   if (!videoClient) {
@@ -25,22 +25,21 @@ export function VideoClientProvider({ children }: ClientProviderProps) {
 }
 
 function useInitializeVideoClient() {
-  const { user, isLoaded: userLoaded } = useUser();
+  const { user, isLoading: loadingUser } = useAuth();
   const [videoClient, setVideoClient] = useState<StreamVideoClient | null>(
     null
   );
 
   useEffect(() => {
-    if (!userLoaded) return;
+    if (loadingUser) return;
 
     let streamUser: User;
 
     if (user?.id) {
       streamUser = {
         id: user.id,
-        name: user.username || user.id,
-        image: user.imageUrl,
-      };
+        name: user.user_metadata.first_name || user.id.slice(4),
+      } as User;
     } else {
       const id = crypto.randomUUID();
       streamUser = {
@@ -56,19 +55,20 @@ function useInitializeVideoClient() {
       throw new Error("Stream API key not set");
     }
 
-    const client = new StreamVideoClient({
+    const client = StreamVideoClient.getOrCreateInstance({
       apiKey,
       user: streamUser,
+
       tokenProvider: user?.id ? getToken : undefined,
     });
 
     setVideoClient(client);
 
     return () => {
-      client.disconnectUser();
+      // client.disconnectUser();
       setVideoClient(null);
     };
-  }, [user?.id, user?.username, user?.imageUrl, userLoaded]);
+  }, [loadingUser, user]);
 
   return videoClient;
 }

@@ -10,17 +10,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui";
-import {
-  Bookmark,
-  Brain,
-  Dumbbell,
-  Lightbulb,
-  ListRestart,
-  Wand2,
-} from "lucide-react";
+import { Bookmark, ListRestart, Wand2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LessonCards } from "@/types/tables";
 import clsx from "clsx";
+import { getCardBackgroundColor, getCardIcon } from "@/utils";
 
 interface SortableStrategyCardProps {
   strategy: LessonCards;
@@ -28,17 +22,6 @@ interface SortableStrategyCardProps {
   onImproveClick: () => Promise<void>;
   onReplaceClick: () => void;
 }
-
-const getCardBackgroundColor = (position: number) => {
-  switch (position) {
-    case 0:
-      return "bg-success-500";
-    case 1:
-      return "bg-secondary-500";
-    case 2:
-      return "bg-accent-400";
-  }
-};
 
 export function CardGhost({ position }: { position: number }) {
   return (
@@ -77,16 +60,6 @@ export function SortableStrategyCard({
     transition,
   };
 
-  const getCardIcon = (position: number) => {
-    switch (position) {
-      case 0:
-        return <Brain />;
-      case 1:
-        return <Dumbbell />;
-      default:
-        return <Lightbulb />;
-    }
-  };
   const handleImproveClick = async () => {
     await onImproveClick();
   };
@@ -94,8 +67,8 @@ export function SortableStrategyCard({
     <Card
       ref={setNodeRef}
       style={style}
-      className={` strategy-card flex-1 p-0 relative rounded-2xl border border-border shadow-md
-                  bg-card text-card-foreground transition-transform
+      className={` strategy-card p-0 relative rounded-2xl border border-border shadow-md
+                  bg-card text-card-foreground transition-transform min-w-[100vw/3]
                   ${isDragging ? "ring-2 ring-primary-500" : ""}`}
     >
       {/* Notch handle */}
@@ -110,69 +83,76 @@ export function SortableStrategyCard({
       />
       <CardHeader
         className={cn(
-          `flex relative text-background items-center p-3 gap-6 rounded-tl-2xl rounded-tr-2xl`,
+          ` relative text-background items-center p-3 gap-3 rounded-tl-2xl rounded-tr-2xl`,
           `${getCardBackgroundColor(index)}`
         )}
       >
-        <div className="min-w-[40px] min-h-[40px] bg-foreground/20 rounded-full flex items-center justify-center">
-          {getCardIcon(strategy.position)}
-        </div>
-        <div className="w-full">
-          <div>
-            <h2 className="font-bold text-xl">{strategy.title} </h2>
+        <div className="flex gap-4 items-center">
+          <div className="min-w-[40px] min-h-[40px] bg-foreground/20 rounded-full flex items-center justify-center">
+            {getCardIcon(strategy.position)}
           </div>
-          <div className="flex items-center  justify-between">
-            <span className="uppercase font-light text-background/70 text-sm">
-              {strategy.position === 0
-                ? "warmup"
-                : strategy.position === 1
-                ? "workout"
-                : "closer"}
-            </span>
-            <div className="flex">
-              <Tooltip>
-                <TooltipContent>Replace</TooltipContent>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="rounded-full"
-                    variant={"ghost"}
-                    size={"sm"}
-                    aria-label="Replace strategy"
-                    onClick={onReplaceClick}
-                  >
-                    <ListRestart />
-                  </Button>
-                </TooltipTrigger>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipContent>Save</TooltipContent>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="rounded-full"
-                    variant={"ghost"}
-                    size={"sm"}
-                    aria-label="Save strategy"
-                  >
-                    <Bookmark />
-                  </Button>
-                </TooltipTrigger>
-              </Tooltip>
-              <Tooltip>
-                <TooltipContent color="white">AI Enhance</TooltipContent>
-                <TooltipTrigger asChild>
-                  <Button
-                    className="rounded-full"
-                    variant={"ghost"}
-                    onClick={handleImproveClick}
-                    size={"sm"}
-                    aria-label="Enhance with AI"
-                  >
-                    <Wand2 />
-                  </Button>
-                </TooltipTrigger>
-              </Tooltip>
+          <div className="w-full">
+            <div>
+              <h2
+                title={strategy.title}
+                className="font-bold text-xl line-clamp-1"
+              >
+                {strategy.title}{" "}
+              </h2>
+              <span className="uppercase font-light text-background/70 text-sm">
+                {strategy.position === 0
+                  ? "warmup"
+                  : strategy.position === 1
+                  ? "workout"
+                  : "closer"}
+              </span>
             </div>
+          </div>
+        </div>
+        <div className="flex items-center  justify-between">
+          <div className="flex">
+            <Tooltip>
+              <TooltipContent>Replace</TooltipContent>
+              <TooltipTrigger asChild>
+                <Button
+                  className="rounded-full"
+                  variant={"ghost"}
+                  size={"icon"}
+                  aria-label="Replace strategy"
+                  onClick={onReplaceClick}
+                >
+                  <ListRestart />
+                </Button>
+              </TooltipTrigger>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipContent>Save</TooltipContent>
+              <TooltipTrigger asChild>
+                <Button
+                  className="rounded-full"
+                  variant={"ghost"}
+                  size={"icon"}
+                  aria-label="Save strategy"
+                >
+                  <Bookmark />
+                </Button>
+              </TooltipTrigger>
+            </Tooltip>
+            <Tooltip>
+              <TooltipContent color="white">AI Enhance</TooltipContent>
+              <TooltipTrigger asChild>
+                <Button
+                  className="rounded-full"
+                  variant={"ghost"}
+                  onClick={handleImproveClick}
+                  size={"icon"}
+                  aria-label="Enhance with AI"
+                >
+                  <Wand2 />
+                </Button>
+              </TooltipTrigger>
+            </Tooltip>
           </div>
         </div>
       </CardHeader>

@@ -12,7 +12,7 @@ import {
 import { CreateSessionInput } from "@/features/sessions/domain";
 import { Controller, useFormContext } from "react-hook-form";
 
-export function CreateSessionForm() {
+export default function CreateSessionForm() {
   const {
     control,
     watch,

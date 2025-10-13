@@ -1,13 +1,12 @@
-import { useCall } from "@stream-io/video-react-sdk";
+import { useCall, useStreamVideoClient } from "@stream-io/video-react-sdk";
 
-export default function useStreamCall() {
+export function useStreamCall() {
   const call = useCall();
-
-  if (!call) {
+  const client = useStreamVideoClient();
+  if (!call || !client) {
     throw new Error(
-      "useStreamCall must be used within a StreamCall component with a valid call prop.",
+      "useStreamCall must be used within a StreamCall component with a valid call prop."
     );
   }
-
   return call;
 }

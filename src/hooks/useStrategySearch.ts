@@ -1,6 +1,6 @@
 import { useStrategies } from "@/features/strategies/hooks";
 import { Strategies } from "@/types/tables";
-import { getUserErrorMessage } from "@/utils/errorUtils";
+import { getUserErrorMessage } from "@/utils/error";
 import { useState, useEffect, useCallback } from "react";
 
 export interface UseMediaSearchResult {
@@ -40,7 +40,6 @@ export function useStrategySearch(): UseMediaSearchResult {
         const searchResults = strategies.filter((s) =>
           s.title.toLowerCase().includes(searchTerm.toLowerCase())
         );
-        console.log({ searchResults, strategies });
         setResults(searchResults);
         setHasSearched(true);
       } catch (error) {

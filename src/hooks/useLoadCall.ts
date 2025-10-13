@@ -1,34 +1,23 @@
-import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
-import { useEffect, useState } from "react";
+// import { getUserErrorMessage } from "@/utils/error";
+// import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
+// import { useEffect, useState } from "react";
 
-export default function useLoadCall(id?: string | null) {
-  const client = useStreamVideoClient();
+// export function useLoadCall(id?: string | null) {
+//   const client = useStreamVideoClient();
+//   const [error, setError] = useState<string | null>(null);
+//   const [mainCall, setMainCall] = useState<Call | null>(null);
+//   const [activeCall, setActiveCall] = useState<Call | null>(null);
 
-  const [call, setCall] = useState<Call>();
-  const [isLoading, setIsLoading] = useState(true);
+//   const [isLoading, setIsLoading] = useState(false);
+//   useEffect(() => {
+//     const handleBeforeUnload = () => {
+//       activeCall?.leave();
+//       mainCall?.leave();
+//       client?.disconnectUser();
+//     };
 
-  useEffect(() => {
-    async function loadCall() {
-      setIsLoading(true);
+//     window.addEventListener("beforeunload", handleBeforeUnload);
+//   });
 
-      if (!client) return;
-
-      const { calls } = await client.queryCalls({
-        filter_conditions: { id },
-      });
-
-      if (calls.length > 0) {
-        const call = calls[0];
-
-        await call.get();
-
-        setCall(call);
-      }
-
-      setIsLoading(false);
-    }
-    loadCall();
-  }, [client, id]);
-
-  return { call, isLoading };
-}
+//   return { mainCall, activeCall, setActiveCall, isLoading, error };
+// }

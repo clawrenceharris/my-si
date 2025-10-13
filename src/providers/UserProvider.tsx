@@ -3,17 +3,17 @@ import React from "react";
 import { createContext, useContext } from "react";
 
 import { ErrorState, LoadingState } from "@/components/states";
-import { UserResource } from "@clerk/types";
-import { useUser as useClerkUser } from "@clerk/nextjs";
 import { Profiles } from "@/types/tables";
 import { useRouter } from "next/navigation";
 import { useProfile } from "@/hooks";
+import { useAuth } from "@/features/auth/hooks";
+import { User } from "@supabase/supabase-js";
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
-  const { user, isLoaded: loadedUser } = useClerkUser();
+function UserProvider({ children }: { children: React.ReactNode }) {
+  const { user, isLoading: loadingUser } = useAuth();
   const { profile, loading: loadingProfile } = useProfile(user?.id);
   const router = useRouter();
-  if (!loadedUser || loadingProfile) {
+  if (loadingUser || loadingProfile) {
     return <LoadingState />;
   }
   if (!user) {
@@ -42,12 +42,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     </UserContext.Provider>
   );
 }
-export type AppUser = { user: UserResource; profile: Profiles };
+export type AppUser = { user: User; profile: Profiles };
 
-export const UserContext = createContext<AppUser | undefined>(undefined);
-export function useUser() {
+const UserContext = createContext<AppUser | undefined>(undefined);
+function useUser() {
   const context = useContext(UserContext);
   if (!context)
     throw new Error("UserContext not set. Use inside (authed) layout.");
   return context;
 }
+
+export { UserProvider, useUser };

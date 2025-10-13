@@ -46,7 +46,7 @@ export const useModal = ({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogPortal>
         <DialogOverlay className="z-99" />
-        <DialogContent className="z-999">
+        <DialogContent className="z-999 max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
@@ -54,11 +54,9 @@ export const useModal = ({
           <DialogDescription className={`${hidesDescription ? "sr-only" : ""}`}>
             {description}
           </DialogDescription>
-          <div className="max-h-[70vh] overflow-auto">
-            {React.isValidElement(children)
-              ? cloneElement(children, { description })
-              : children}
-          </div>
+          {React.isValidElement(children)
+            ? cloneElement(children, { description })
+            : children}
         </DialogContent>
       </DialogPortal>
     </Dialog>

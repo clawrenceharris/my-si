@@ -11,27 +11,28 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { Label, Switch, Toggle } from "@/components/ui";
-import { useSupabaseClient } from "@/providers";
+import { Toggle } from "@/components/ui";
 import { StudentContexts } from "@/types/tables";
 import {
   GeneratePlaybookInput,
   generatePlaybookSchema,
 } from "@/features/playbooks/domain";
+import { supabase } from "@/lib/supabase/client";
+import { LoadingState } from "@/components/states";
 
-export function GeneratePlaybookForm({
+export default function GeneratePlaybookForm({
   ...props
 }: FormLayoutProps<GeneratePlaybookInput>) {
-  const client = useSupabaseClient();
   const [contexts, setContexts] = useState<StudentContexts[]>([]);
-
+  const [contextsLoading, setContextsLoading] = useState(true);
   useEffect(() => {
     const fetchContexts = async () => {
-      const { data, error } = await client.from("student_contexts").select();
-      if (!error) setContexts(data || []);
+      const { data } = await supabase.from("student_contexts").select();
+      setContextsLoading(false);
+      setContexts(data || []);
     };
     fetchContexts();
-  }, [client]);
+  }, []);
   return (
     <FormLayout<GeneratePlaybookInput>
       resolver={zodResolver(generatePlaybookSchema)}
@@ -84,53 +85,45 @@ export function GeneratePlaybookForm({
             )}
           />
 
-          <FormField
-            control={control}
-            name="contexts"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Context Tags</FormLabel>
-                <div className="flex gap-4 flex-wrap">
-                  {contexts.map((ctx) => (
-                    <Toggle
-                      variant={"outline"}
-                      key={ctx.id}
-                      size={"lg"}
-                      pressed={field.value?.includes(ctx.context)}
-                      onPressedChange={(pressed) => {
-                        if (pressed) {
-                          console.log(field.value);
-
-                          field.onChange([...field.value, ctx.context]);
-                        } else {
-                          field.onChange(
-                            field.value.filter((c: string) => c !== ctx.context)
-                          );
-                        }
-                      }}
-                    >
-                      {ctx.context}
-                    </Toggle>
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="virtual"
-            control={control}
-            render={({ field }) => (
-              <Label htmlFor="virtual">
-                Virtual:
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  id="virtual"
-                />
-              </Label>
-            )}
-          />
+          {contexts.length > 0 && (
+            <FormField
+              control={control}
+              name="contexts"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Context Tags</FormLabel>
+                  <div className="flex gap-4 max-h-40 overflow-auto flex-wrap">
+                    {contextsLoading ? (
+                      <LoadingState variant="container" />
+                    ) : (
+                      contexts.map((ctx) => (
+                        <Toggle
+                          variant={"outline"}
+                          key={ctx.id}
+                          size={"lg"}
+                          pressed={field.value?.includes(ctx.context)}
+                          onPressedChange={(pressed) => {
+                            if (pressed) {
+                              field.onChange([...field.value, ctx.context]);
+                            } else {
+                              field.onChange(
+                                field.value.filter(
+                                  (c: string) => c !== ctx.context
+                                )
+                              );
+                            }
+                          }}
+                        >
+                          {ctx.context}
+                        </Toggle>
+                      ))
+                    )}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </>
       )}
     </FormLayout>

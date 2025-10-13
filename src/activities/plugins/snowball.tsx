@@ -1,25 +1,17 @@
+import React, { useState } from "react";
 import { Button, Textarea } from "@/components/ui";
 import { PlaybookContext, PlaybookDefinition } from "@/types/playbook";
-import { useState } from "react";
+import { CircleQuestionMark } from "lucide-react";
 
-function SnowballCard({
-  question,
-  onClick,
-}: {
-  question: string;
-  onClick: () => void;
-}) {
-  const [shown, setShown] = useState(false);
+function SnowballCard({ onClick }: { onClick: () => void }) {
   return (
-    <Button
-      onClick={() => {
-        setShown(true);
-        onClick();
-      }}
-      className="px-12 py-4 min-h-8 w-full flex items-center justify-center bg-muted-foreground rounded-xl"
+    <button
+      aria-label="Hidden question"
+      onClick={onClick}
+      className="center-all rounded-full w-10 h-10 bg-white  shadow-md"
     >
-      {shown ? question : ""}
-    </Button>
+      <CircleQuestionMark />
+    </button>
   );
 }
 
@@ -40,7 +32,7 @@ function SnowballUI({ ctx }: { ctx: PlaybookContext }) {
         <Textarea
           value={myQuestion}
           onChange={(e) => setMyQuestion(e.target.value)}
-          className="w-full border rounded p-2"
+          className="w-full border !bg-black/5 rounded p-2"
         />
         <Button
           onClick={() => {
@@ -66,33 +58,32 @@ function SnowballUI({ ctx }: { ctx: PlaybookContext }) {
     if (myChoiceId) {
       return (
         <div className="space-y-3">
-          <p className="font-medium">You picked this question:</p>
-          <div className="p-3 rounded bg-muted">{originalPool[myChoiceId]}</div>
-          <p className="italic">Take a moment to answer it.</p>
+          <p className="font-medium ">You picked this question:</p>
+          <div className="p-3 rounded-xl bg-white">
+            {originalPool[myChoiceId]}
+          </div>
         </div>
       );
     }
 
     // Otherwise, show the pool to pick from
     return (
-      <div className="space-y-3">
+      <div className="space-y-3 overflow-hidden w-full h-full">
         <p className="font-medium">Pick a question to answer:</p>
-        <ul className="space-y-2">
-          {Object.entries(pool).map(([qid, q]) => (
-            <li key={qid}>
-              <SnowballCard
-                question={String(q)}
-                onClick={() => {
-                  ctx.call.sendCustomEvent({
-                    type: "snowball:pick",
-                    userId: ctx.userId,
-                    questionId: qid,
-                  });
-                }}
-              />
-            </li>
+        <div className="faded-row grid grid-flow-col grid-rows-3 auto-cols-[minmax(40px,1fr)] gap-3 w-full mx-auto h-[200px] overflow-auto">
+          {Object.entries(pool).map(([id]) => (
+            <SnowballCard
+              key={id}
+              onClick={() => {
+                ctx.call.sendCustomEvent({
+                  type: "snowball:pick",
+                  userId: ctx.userId,
+                  questionId: id,
+                });
+              }}
+            />
           ))}
-        </ul>
+        </div>
       </div>
     );
   }
@@ -103,9 +94,9 @@ function SnowballUI({ ctx }: { ctx: PlaybookContext }) {
       <div className="space-y-3">
         <p className="font-medium">Discussion Phase</p>
         {myChoiceId ? (
-          <div>
+          <div className="space-y-2">
             <p className="italic">You’re answering:</p>
-            <div className="p-3 rounded bg-muted">
+            <div className="p-3 rounded-xl bg-white">
               {originalPool[myChoiceId]}
             </div>
           </div>
@@ -163,7 +154,10 @@ export const SnowballActivity: PlaybookDefinition = {
   slug: "snowball",
   title: "Snowball",
   phases: ["write", "pick", "discuss"],
-
+  start(ctx: PlaybookContext) {
+    ctx.call.sendCustomEvent({ type: "snowball:start", slug: "pass-problem" });
+    ctx.setState({ phase: "write", teamSteps: {} });
+  },
   handleEvent(e, ctx) {
     switch (e.custom.type) {
       case "snowball:submit": {

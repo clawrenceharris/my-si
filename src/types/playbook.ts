@@ -11,11 +11,13 @@ export interface PlaybookContext {
   setState: (next: Record<string, any>) => void;
   isHost: boolean;
   slug: string;
+  position: number;
 }
 export interface PlaybookDefinition {
   slug: string;
   title: string;
   phases: string[];
+  start: (ctx: PlaybookContext) => void;
   handleEvent: (event: CustomVideoEvent, ctx: PlaybookContext) => void;
   Component: React.FC<{ ctx: PlaybookContext }>;
   HostControls: React.FC<{ ctx: PlaybookContext }>;

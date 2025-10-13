@@ -1,22 +1,21 @@
 export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai/client";
-import { auth } from "@clerk/nextjs/server";
 
 import {} from "@/types";
 import { LessonCards, LessonsInsert, Strategies } from "@/types/tables";
-import createClerkSupabaseClient from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
   const { topic, course_name, contexts, virtual = false } = await req.json();
-  const { sessionId, getToken, userId } = await auth();
-  if (!sessionId) {
+
+  const client = await createClient();
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const client = createClerkSupabaseClient({
-    getTokenFn: () => getToken(),
-  });
   const { data: strategies, error: se } = await client.rpc(
     "get_strategies_by_contexts",
     {
@@ -87,7 +86,7 @@ ${catalog
   const { data: playbook, error: le } = await client
     .from("lessons")
     .insert<LessonsInsert>({
-      user_id: userId,
+      owner: user.id,
       topic,
       course_name,
       virtual,

@@ -2,20 +2,17 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/lib/openai/client";
-import createClerkSupabaseClient from "@/lib/supabase/client";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
   const { lessonCardId } = await req.json();
-
-  const { sessionId, getToken } = await auth();
-  if (!sessionId) {
+  const client = await createClient();
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const client = createClerkSupabaseClient({
-    getTokenFn: () => getToken(),
-  });
-
   // Load card copy
   const { data: card, error } = await client
     .from("lesson_cards")

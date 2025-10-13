@@ -12,13 +12,15 @@ const buttonVariants = cva("btn", {
       outline: "btn-outline",
       secondary: "btn-secondary",
       ghost: "btn-ghost",
-      link: "text-primary underline-offset-4 hover:underline",
+      muted: "btn-muted",
+
+      link: "",
     },
     size: {
       default: "h-9 px-4 py-2",
       sm: "h-8 rounded-full px-3 text-xs",
       lg: "h-10 rounded-full px-8",
-      icon: "h-10 w-10",
+      icon: "min-h-9 min-w-9",
     },
   },
   defaultVariants: {

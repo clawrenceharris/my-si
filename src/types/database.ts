@@ -14,104 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      activity_flows: {
-        Row: {
-          card_slug: string
-          created_at: string | null
-          id: string
-          instruction: string
-          interaction_type: string
-          step_number: number
-        }
-        Insert: {
-          card_slug: string
-          created_at?: string | null
-          id?: string
-          instruction: string
-          interaction_type: string
-          step_number: number
-        }
-        Update: {
-          card_slug?: string
-          created_at?: string | null
-          id?: string
-          instruction?: string
-          interaction_type?: string
-          step_number?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "activity_flows_card_slug_fkey"
-            columns: ["card_slug"]
-            isOneToOne: false
-            referencedRelation: "strategies"
-            referencedColumns: ["slug"]
-          },
-        ]
-      }
-      activity_types: {
-        Row: {
-          description: string | null
-          id: string
-          title: string
-        }
-        Insert: {
-          description?: string | null
-          id?: string
-          title?: string
-        }
-        Update: {
-          description?: string | null
-          id?: string
-          title?: string
-        }
-        Relationships: []
-      }
-      confusion_feedback: {
-        Row: {
-          created_at: string
-          id: string
-          is_confused: boolean
-          session_id: string
-          student_checkin_id: string | null
-          timestamp: string
-          topic_context: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_confused: boolean
-          session_id: string
-          student_checkin_id?: string | null
-          timestamp?: string
-          topic_context?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_confused?: boolean
-          session_id?: string
-          student_checkin_id?: string | null
-          timestamp?: string
-          topic_context?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "confusion_feedback_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "confusion_feedback_student_checkin_id_fkey"
-            columns: ["student_checkin_id"]
-            isOneToOne: false
-            referencedRelation: "session_checkins"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       lesson_cards: {
         Row: {
           card_slug: string
@@ -124,6 +26,7 @@ export type Database = {
           position: number
           steps: string[]
           title: string
+          updated_at: string | null
           virtualized: boolean | null
         }
         Insert: {
@@ -137,6 +40,7 @@ export type Database = {
           position: number
           steps: string[]
           title: string
+          updated_at?: string | null
           virtualized?: boolean | null
         }
         Update: {
@@ -150,6 +54,7 @@ export type Database = {
           position?: number
           steps?: string[]
           title?: string
+          updated_at?: string | null
           virtualized?: boolean | null
         }
         Relationships: [
@@ -167,28 +72,49 @@ export type Database = {
           course_name: string | null
           created_at: string | null
           id: string
+          owner: string | null
           topic: string
           updated_at: string | null
-          user_id: string | null
           virtual: boolean | null
         }
         Insert: {
           course_name?: string | null
           created_at?: string | null
           id?: string
+          owner?: string | null
           topic: string
           updated_at?: string | null
-          user_id?: string | null
           virtual?: boolean | null
         }
         Update: {
           course_name?: string | null
           created_at?: string | null
           id?: string
+          owner?: string | null
           topic?: string
           updated_at?: string | null
-          user_id?: string | null
           virtual?: boolean | null
+        }
+        Relationships: []
+      }
+      playfield_profiles: {
+        Row: {
+          avatar: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+        }
+        Update: {
+          avatar?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
         }
         Relationships: []
       }
@@ -198,105 +124,38 @@ export type Database = {
           courses: string[] | null
           created_at: string | null
           email: string | null
-          full_name: string
+          first_name: string
           id: string
+          last_name: string | null
           onboarding_completed: boolean | null
           role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string | null
-          user_id: string | null
         }
         Insert: {
           avatar_url?: string | null
           courses?: string[] | null
           created_at?: string | null
           email?: string | null
-          full_name?: string
+          first_name: string
           id?: string
+          last_name?: string | null
           onboarding_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
-          user_id?: string | null
         }
         Update: {
           avatar_url?: string | null
           courses?: string[] | null
           created_at?: string | null
           email?: string | null
-          full_name?: string
+          first_name?: string
           id?: string
+          last_name?: string | null
           onboarding_completed?: boolean | null
           role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
-          user_id?: string | null
         }
         Relationships: []
-      }
-      session_checkins: {
-        Row: {
-          checked_in_at: string
-          created_at: string
-          id: string
-          session_id: string
-          student_id: string | null
-          student_name: string
-        }
-        Insert: {
-          checked_in_at?: string
-          created_at?: string
-          id?: string
-          session_id: string
-          student_id?: string | null
-          student_name: string
-        }
-        Update: {
-          checked_in_at?: string
-          created_at?: string
-          id?: string
-          session_id?: string
-          student_id?: string | null
-          student_name?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "session_checkins_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      session_inputs: {
-        Row: {
-          assigned_to: string | null
-          id: string
-          input: string
-          session_id: string
-          user_id: string
-        }
-        Insert: {
-          assigned_to?: string | null
-          id?: string
-          input: string
-          session_id: string
-          user_id: string
-        }
-        Update: {
-          assigned_to?: string | null
-          id?: string
-          input?: string
-          session_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "session_inputs_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       sessions: {
         Row: {
@@ -305,7 +164,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
-          leader_id: string | null
+          instructor: string | null
           lesson_id: string | null
           scheduled_start: string
           session_code: string | null
@@ -320,7 +179,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          leader_id?: string | null
+          instructor?: string | null
           lesson_id?: string | null
           scheduled_start?: string
           session_code?: string | null
@@ -335,7 +194,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          leader_id?: string | null
+          instructor?: string | null
           lesson_id?: string | null
           scheduled_start?: string
           session_code?: string | null
@@ -344,15 +203,7 @@ export type Database = {
           updated_at?: string
           virtual?: boolean
         }
-        Relationships: [
-          {
-            foreignKeyName: "sessions_leader_id_fkey"
-            columns: ["leader_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-        ]
+        Relationships: []
       }
       strategies: {
         Row: {
@@ -471,23 +322,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
-      get_confusion_stats: {
-        Args: { session_uuid: string; time_window_minutes?: number }
-        Returns: {
-          confused_count: number
-          confusion_percentage: number
-          recent_feedback_count: number
-          total_feedback: number
-        }[]
-      }
-      get_confusion_timeline: {
-        Args: { interval_minutes?: number; session_uuid: string }
-        Returns: {
-          confusion_level: number
-          feedback_count: number
-          time_bucket: string
-        }[]
-      }
       get_database_stats: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -507,14 +341,6 @@ export type Database = {
           topic: string
         }[]
       }
-      get_session_checkin_stats: {
-        Args: { session_uuid: string }
-        Returns: {
-          latest_checkin: string
-          total_checkins: number
-          unique_students: number
-        }[]
-      }
       get_session_summary: {
         Args: { session_uuid: string }
         Returns: Json
@@ -529,14 +355,6 @@ export type Database = {
           title: string
           virtual_friendly: boolean
         }[]
-      }
-      refresh_session_dashboard_stats: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      requesting_user_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
       }
       start_session: {
         Args: { session_uuid: string }

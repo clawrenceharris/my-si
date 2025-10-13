@@ -1,15 +1,11 @@
-import { useSupabaseClient } from "@/providers/SupabaseClientProvider";
 import { useQuery } from "@tanstack/react-query";
-import { StrategiesService } from "../domain/strategies.service";
+import { strategiesService } from "../domain";
 
 export function useStrategies() {
-  const client = useSupabaseClient();
-  const service = new StrategiesService(client);
-
   const strategiesQuery = useQuery({
     queryKey: ["strategies"],
     queryFn: async () => {
-      return await service.getAll();
+      return await strategiesService.getAll();
     },
   });
 

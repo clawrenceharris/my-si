@@ -19,7 +19,6 @@ import {
 } from "@/components/ui";
 import { Sessions } from "@/types/tables";
 import { Link } from "lucide-react";
-import { CreateSessionForm } from "./CreateSessionForm";
 import {
   CreateSessionInput,
   createSessionSchema,
@@ -29,11 +28,12 @@ import { useSessions } from "@/features/sessions/hooks";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/providers";
 import { useModal } from "@/hooks";
+import { CreateSessionForm } from "@/components/features/sessions";
 
 interface SessionCardProps {
   session: Sessions;
 }
-export function SessionCard({ session }: SessionCardProps) {
+export default function SessionCard({ session }: SessionCardProps) {
   const { user } = useUser();
   const { sessionsQuery, updateSession } = useSessions(user.id);
   const router = useRouter();
@@ -94,7 +94,7 @@ export function SessionCard({ session }: SessionCardProps) {
           data: { status: "active" },
         });
       else if (session.virtual) {
-        router.push(`/session/virtual/${session.id}`);
+        router.push(`/session/playfield/${session.id}`);
       }
     } catch {}
   };
@@ -115,7 +115,7 @@ export function SessionCard({ session }: SessionCardProps) {
     sessionsQuery.refetch();
   };
   const handleCopy = () => {
-    const link = `${window.location.origin}/session/virtual/${session.id}`;
+    const link = `${window.location.origin}/session/playfield/${session.id}`;
     navigator.clipboard.writeText(link);
     alert("Link copied to clipboard!");
   };

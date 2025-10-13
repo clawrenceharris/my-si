@@ -12,7 +12,7 @@ import { Button, Input } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { Strategies } from "@/types/tables";
 import { useStrategySearch } from "@/hooks/useStrategySearch";
-import { StrategyCard } from "./StrategyCard";
+import { StrategyCard } from "./";
 
 export interface StrategySearchFieldProps
   extends InputHTMLAttributes<HTMLInputElement> {
@@ -20,7 +20,7 @@ export interface StrategySearchFieldProps
   selectedStrategy: Strategies | null;
 }
 
-export function StrategySearchField({
+export default function StrategySearchField({
   onStrategySelect,
   selectedStrategy,
   ...props

@@ -1,18 +1,18 @@
-import { normalizeError } from "@/utils/errorUtils";
+import { normalizeError } from "@/utils/error";
 
 import { Profiles, ProfilesInsert, ProfilesUpdate } from "@/types/tables";
 import { ProfilesRepository } from "../data";
-import { SupabaseClient } from "@supabase/supabase-js";
 import { AppErrorCode } from "@/types/errors";
+import { supabase } from "@/lib/supabase/client";
 
 /**
  * Service layer for profile business logic
  *
  */
-export class ProfileService {
+class ProfileService {
   private repository: ProfilesRepository;
-  constructor(client: SupabaseClient) {
-    this.repository = new ProfilesRepository(client);
+  constructor() {
+    this.repository = new ProfilesRepository(supabase);
   }
 
   /**
@@ -35,7 +35,7 @@ export class ProfileService {
         throw new Error(AppErrorCode.PERMISSION_DENIED);
       }
 
-      return await this.repository.getSingleBy("user_id", userId);
+      return await this.repository.getById(userId);
     } catch (error) {
       throw normalizeError(error);
     }
@@ -73,3 +73,5 @@ export class ProfileService {
     }
   }
 }
+
+export const profileService = new ProfileService();

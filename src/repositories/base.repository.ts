@@ -14,7 +14,7 @@ export abstract class BaseRepository<TDomain> {
       .eq("id", id)
       .single();
 
-    if (error || !data) return null;
+    if (error || !data) throw error;
     return data;
   }
 
@@ -83,9 +83,13 @@ export abstract class BaseRepository<TDomain> {
 
     if (error) throw error;
   }
-  async getAllBy(column: string, value: string): Promise<TDomain[]> {
+  async getAllBy(
+    column: string,
+    value: string,
+    tableName?: string
+  ): Promise<TDomain[]> {
     const { data, error } = await this.client
-      .from(this.tableName)
+      .from(tableName || this.tableName)
       .select()
       .eq(column, value);
     if (error) {
@@ -93,8 +97,11 @@ export abstract class BaseRepository<TDomain> {
     }
     return data || [];
   }
-  async getAll(): Promise<TDomain[]> {
-    const { data, error } = await this.client.from(this.tableName).select();
+
+  async getAll(tableName?: string): Promise<TDomain[]> {
+    const { data, error } = await this.client
+      .from(tableName || this.tableName)
+      .select();
     if (error) {
       throw error;
     }

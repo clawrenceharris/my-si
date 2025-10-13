@@ -1,16 +1,21 @@
-// src/services/LessonsService.ts
-import { SupabaseClient } from "@supabase/supabase-js";
 import { Strategies } from "@/types/tables";
 import { StrategiesRepository } from "../data";
+import { supabase } from "@/lib/supabase/client";
 
-export class StrategiesService {
+class StrategiesService {
   private repository: StrategiesRepository;
 
-  constructor(client: SupabaseClient) {
-    this.repository = new StrategiesRepository(client);
+  constructor() {
+    this.repository = new StrategiesRepository(supabase);
   }
-
+  async getStrategyById(id: string) {
+    return await this.repository.getById(id);
+  }
+  async getStrategyBySlug(slug: string) {
+    return await this.repository.getSingleBy("slug", slug);
+  }
   async getAll(): Promise<Strategies[]> {
     return await this.repository.getAll();
   }
 }
+export const strategiesService = new StrategiesService();

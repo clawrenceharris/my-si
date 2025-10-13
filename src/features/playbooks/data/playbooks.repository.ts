@@ -11,11 +11,11 @@ export class PlaybooksRepository extends BaseRepository<Lessons> {
     super(client, "lessons");
   }
 
-  async getLessonStrategies(lessonId: string): Promise<LessonCards[]> {
+  async getPlaybookStrategies(playbookId: string): Promise<LessonCards[]> {
     const { error, data } = await this.client
       .from("lesson_cards")
-      .select("*")
-      .eq("lesson_id", lessonId)
+      .select()
+      .eq("lesson_id", playbookId)
       .order("position");
     if (error) {
       throw error;
@@ -23,16 +23,13 @@ export class PlaybooksRepository extends BaseRepository<Lessons> {
     return data;
   }
   async updatePlaybookStrategy(
-    lessonId: string,
-    cardSlug: string,
+    strategyId: string,
     data: LessonCardsUpdate
   ): Promise<LessonCards> {
-    console.log({ cardSlug });
     const { error, data: card } = await this.client
       .from("lesson_cards")
       .update<LessonCardsUpdate>(data)
-      .eq("card_slug", cardSlug)
-      .eq("lesson_id", lessonId)
+      .eq("id", strategyId)
       .select()
       .single();
     if (error) {
@@ -42,14 +39,21 @@ export class PlaybooksRepository extends BaseRepository<Lessons> {
   }
 
   async updateStrategyPositions(
-    lessonId: string,
     strategies: { id: string; position: number }[]
   ) {
     const updates: Promise<LessonCards>[] = [];
-
     for (const s of strategies) {
+      const phase: LessonCards["phase"] =
+        s.position === 0
+          ? "warmup"
+          : s.position === 1
+          ? "workout"
+          : s.position === 2
+          ? "closer"
+          : "warmup";
+
       updates.push(
-        this.updatePlaybookStrategy(lessonId, s.id, { position: s.position })
+        this.updatePlaybookStrategy(s.id, { position: s.position, phase })
       );
     }
     try {

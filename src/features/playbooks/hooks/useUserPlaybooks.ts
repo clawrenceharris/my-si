@@ -1,37 +1,34 @@
-import { useSupabaseClient } from "@/providers/SupabaseClientProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlaybooksService } from "../domain";
 import { LessonsInsert, LessonsUpdate } from "@/types/tables";
+import { playbooksService } from "../domain";
 
 export function useUserPlaybooks(userId?: string) {
-  const client = useSupabaseClient();
-  const service = new PlaybooksService(client);
   const queryClient = useQueryClient();
 
   const playbooksQuery = useQuery({
     queryKey: ["playbooks", userId],
     queryFn: async () => {
-      if (userId) return service.getAllByUser(userId);
+      if (userId) return playbooksService.getAllByUser(userId);
     },
     enabled: !!userId,
   });
 
   const addPlaybook = useMutation({
     mutationFn: async (data: LessonsInsert) =>
-      await service.createPlaybook(data),
+      await playbooksService.createPlaybook(data),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["playbooks", userId] }),
   });
 
   const updatePlaybook = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: LessonsUpdate }) =>
-      await service.updatePlaybook(id, data),
+      await playbooksService.updatePlaybook(id, data),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["playbooks", userId] }),
   });
 
   const deletePlaybook = useMutation({
-    mutationFn: async (id: string) => await service.deletePlaybook(id),
+    mutationFn: async (id: string) => await playbooksService.deletePlaybook(id),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["playbooks", userId] }),
   });

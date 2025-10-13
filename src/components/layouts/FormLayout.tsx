@@ -12,7 +12,7 @@ import {
 import { Form, FormDescription, FormMessage } from "../ui/form";
 import { Button } from "../ui";
 import { Loader2 } from "lucide-react";
-import { getUserErrorMessage } from "@/utils/errorUtils";
+import { getUserErrorMessage } from "@/utils/error";
 
 export interface FormLayoutProps<T extends FieldValues>
   extends UseFormProps<T> {
@@ -21,7 +21,7 @@ export interface FormLayoutProps<T extends FieldValues>
   showsCancelButton?: boolean;
   submitText?: string;
   cancelText?: string;
-  onSubmit?: (data: T) => void | Promise<any>;
+  onSubmit?: (data: T) => any | Promise<any>;
   onCancel?: () => void;
   onSuccess?: () => void;
   isLoading?: boolean;
@@ -78,6 +78,7 @@ export function FormLayout<T extends FieldValues>({
   const handleSubmit = async (data: T) => {
     try {
       await onSubmit?.(data);
+
       onSuccess?.();
     } catch (error) {
       console.error(error);
