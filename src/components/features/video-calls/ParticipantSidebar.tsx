@@ -1,5 +1,5 @@
 import { StreamVideoParticipant } from "@stream-io/video-react-sdk";
-import { DisabledVideoPlaceholder, CustomParticipantView } from "./";
+import { CustomParticipantView } from "./";
 import {
   Carousel,
   CarouselContent,
@@ -24,16 +24,7 @@ export default function ParticipantSidebar({
             className="align-center h-50 basis-1/2"
             key={p.sessionId}
           >
-            <CustomParticipantView
-              VideoPlaceholder={() => (
-                <DisabledVideoPlaceholder
-                  image={p.image}
-                  showsMessage={false}
-                  size="large"
-                />
-              )}
-              participant={p}
-            />
+            <CustomParticipantView participant={p} />
           </CarouselItem>
         ))}
       </CarouselContent>

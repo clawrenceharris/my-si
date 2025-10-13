@@ -25,7 +25,7 @@ import {
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { LessonCards, Strategies } from "@/types/tables";
 
-import { useSession, useSessions } from "@/features/sessions/hooks";
+import { useSessions } from "@/features/sessions/hooks";
 import { useUser } from "@/providers";
 import { CreateSessionInput } from "@/features/sessions/domain";
 import { FormLayout } from "@/components/layouts";

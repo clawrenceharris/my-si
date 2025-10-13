@@ -48,7 +48,6 @@ function MeetingScreen({ session }: { session: Sessions }) {
   const [hasJoined, setHasJoined] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
   const callingState = useCallCallingState();
-  const { syncLocal } = usePlayfield();
   const handleJoin = async ({ name, image }: PlayfieldProfile) => {
     try {
       if (!client.state.connectedUser) {

@@ -1,4 +1,4 @@
-import { BreakoutRoom } from "@/hooks";
+import { BreakoutRoom } from "@/providers";
 
 export function generateRooms<
   T extends { name: string; userId: string; sessionId: string }

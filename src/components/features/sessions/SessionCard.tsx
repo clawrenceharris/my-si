@@ -35,7 +35,7 @@ interface SessionCardProps {
 }
 export default function SessionCard({ session }: SessionCardProps) {
   const { user } = useUser();
-  const { sessionsQuery, updateSession } = useSessions(user.id);
+  const { refetch, updateSession } = useSessions(user.id);
   const router = useRouter();
 
   const {
@@ -112,7 +112,7 @@ export default function SessionCard({ session }: SessionCardProps) {
       id: session.id,
       data: { ...rest, scheduled_start: new Date(startDate).toUTCString() },
     });
-    sessionsQuery.refetch();
+    refetch();
   };
   const handleCopy = () => {
     const link = `${window.location.origin}/session/playfield/${session.id}`;
